@@ -1,6 +1,3 @@
-import json
-import csv
-import anytree
 import datetime
 import pandas as pd
 import logging
@@ -37,6 +34,7 @@ def load2df(path, input_format='csv') -> pd.DataFrame:
         df = None
 
     return df
+
 
 
 
