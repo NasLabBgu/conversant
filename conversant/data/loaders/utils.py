@@ -1,6 +1,4 @@
-from anytree import Node, RenderTree
-import datetime
-import pandas as pd
+from anytree import Node
 import logging
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
@@ -9,12 +7,8 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
 
 def df2tree(df) -> dict:
     """
-    takes a df with one conversation tree and converts it to dictionary where keys are post ids
-    and values are 'anytree' Node objects.
-
-    :parameter: df: data frame of conversation data
-    :returns: dict of Nodes of a tree
-
+    takes a df with tree information and converts to tree data type
+    returns dict of Nodes of a tree
     """
     # create Node objects for all instances in the df
     tree = {x.index1: Node(name=x.node_id, tree_id=x.tree_id, index=x.index1, timestamp=x.timestamp,
@@ -34,7 +28,3 @@ def df2tree(df) -> dict:
     final_tree = {key: tree[key] for key in tree if key not in ids_to_drop}
 
     return final_tree
-
-
-def df2trees(df) -> list:
-    pass
