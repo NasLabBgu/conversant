@@ -19,3 +19,5 @@ def clean_text_field(df) -> pd.DataFrame:
 
 
 
+# how to log into git?
+# how to define interpeter?
