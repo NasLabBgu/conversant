@@ -27,8 +27,18 @@ def load2df(path, input_format='csv') -> pd.DataFrame:
         df['index1'] = df.index
         logging.info(f'Conversation sample has {df.tree_id.nunique()} unique trees')
         logging.info(f'Conversation sample has {df.author.nunique()} unique authors')
-        logging.info(f"Data is from {datetime.utcfromtimestamp(df.timestamp.min()).strftime('%Y-%m-%d')}")
-        logging.info(f"to {datetime.utcfromtimestamp(df.timestamp.max()).strftime('%Y-%m-%d')}")
+        #logging.info(f"Data is from {datetime.utcfromtimestamp(df.timestamp.min()).strftime('%Y-%m-%d')}")
+        #logging.info(f"to {datetime.utcfromtimestamp(df.timestamp.max()).strftime('%Y-%m-%d')}")
+
+    if input_format == 'pickle':
+        df = pd.read_pickle(path)
+        df = df.filter(['node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'], axis=1)
+
+        df['index1'] = df.index
+        logging.info(f'Conversation sample has {df.tree_id.nunique()} unique trees')
+        logging.info(f'Conversation sample has {df.author.nunique()} unique authors')
+        #logging.info(f"Data is from {datetime.utcfromtimestamp(df.timestamp.min()).strftime('%Y-%m-%d')}")
+        #logging.info(f"to {datetime.utcfromtimestamp(df.timestamp.max()).strftime('%Y-%m-%d')}")
 
     if input_format == 'json':
         # TODO: add code for reading json to df RON
@@ -37,7 +47,7 @@ def load2df(path, input_format='csv') -> pd.DataFrame:
     return df
 
 
-def load2anytree(path, input_format='csv') -> pd.DataFrame:
+def load2anytree(path, input_format='csv') -> list:
     """
     :parameter path: path to file
     :parameter input_format: type of file (string) i.e 'csv', 'json'
@@ -60,6 +70,13 @@ def load2anytree(path, input_format='csv') -> pd.DataFrame:
         logging.info(f"Data is from {datetime.utcfromtimestamp(df.timestamp.min()).strftime('%Y-%m-%d')}")
         logging.info(f"to {datetime.utcfromtimestamp(df.timestamp.max()).strftime('%Y-%m-%d')}")
 
+    if input_format == 'pickle':
+        df = pd.read_pickle(path)
+        df = df.filter(['node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'], axis=1)
+        df['index1'] = df.index
+        logging.info(f'Conversation sample has {df.tree_id.nunique()} unique trees')
+        logging.info(f'Conversation sample has {df.author.nunique()} unique authors')
+
     if input_format == 'json':
         # TODO: add code for reading json to df RON
         df = None
@@ -67,7 +84,7 @@ def load2anytree(path, input_format='csv') -> pd.DataFrame:
     trees_l = list(df.tree_id)
     grouped = df[df.tree_id.isin(trees_l)].groupby('tree_id')
     all_trees = [df2tree(group) for name, group in grouped]
-    logging.info(f'done converting {len(all_trees)} conversations to trees')
+    logging.info(f'Done converting {len(all_trees)} conversations to trees')
 
     return all_trees
 
