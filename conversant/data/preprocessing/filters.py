@@ -26,8 +26,9 @@ def filter_under_depth(all_trees) -> list:
 
 
 def filter_DeltaBot(all_trees) -> list:
-    """:parameter:
-        takes a list of tree dictionaries and filter posts by DeltaBot and deletes his descendents.
+    """:parameter: all_trees - list of dictionary conversation trees
+        takes a list of tree dictionaries and filter posts by DeltaBot
+        and deletes his descendents.
     """
     # drop DeltaBot and his descendents
     for tree in all_trees:
@@ -38,4 +39,6 @@ def filter_DeltaBot(all_trees) -> list:
                 ids_to_drop.append([c.index for c in v.descendants])
 
         tree = {key: tree[key] for key in tree if key not in ids_to_drop}
+    logging.info('conversations are now free of DeltaBot and his descendents')
+    
     return all_trees
