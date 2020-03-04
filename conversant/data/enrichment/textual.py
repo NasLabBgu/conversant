@@ -16,8 +16,3 @@ def clean_text_field(df) -> pd.DataFrame:
     c_text = df.text.apply(lambda x: clean_text(x))
     df = df.assign(clean_text=c_text)
     return df
-
-
-
-# how to log into git?
-# how to define interpeter?
