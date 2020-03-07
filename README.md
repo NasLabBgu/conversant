@@ -1,5 +1,5 @@
 <img src="conversant/resources/logo.png" 
-style='float:right; width:200px; margin: 0 20px;'>
+style='float:right; width:400px; margin: 0 20px;'>
 
 # CONVERSANT
 ---
