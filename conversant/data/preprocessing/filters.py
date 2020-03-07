@@ -1,4 +1,6 @@
 import logging
+from anytree.search import findall
+from .utils import find_root
 
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
@@ -18,11 +20,22 @@ def filter_over_leaf_rate(all_trees) -> list:
     pass
 
 
-def filter_under_depth(all_trees) -> list:
+def filter_under_depth(all_trees, depth) -> list:
     """:parameter
     takes a list of tree dictionaries and filter trees that have over % of leaves.
     """
-    pass
+    all_trees_processed = []
+    
+    logging.info(f'filtering trees under {depth}, input count of trees is {len(all_trees)}')
+    for tree in all_trees:
+        root = find_root(tree)
+        if findall(tree[root], filter_=lambda node: node.depth > 2):
+            all_trees_processed.append(tree)
+        else:
+            pass
+    logging.info(f'filtered, output count of trees is {len(all_trees_processed)}')
+
+    return all_trees_processed
 
 
 def filter_DeltaBot(all_trees) -> list:
