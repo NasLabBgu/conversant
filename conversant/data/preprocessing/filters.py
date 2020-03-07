@@ -6,11 +6,24 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
 
-def filter_under_n(all_trees) -> list:
-    """:parameter
-    takes a list of tree dictionaries and filter trees under N nodes
+def filter_under_n(all_trees, n: int) -> list:
     """
-    pass
+    :parameter: all_trees - list of dictionary conversation trees like [{'node_id: node object}]
+    :parameter: n - the minimum number of nodes accepted in the tree
+    
+    takes a list of tree dictionaries and filter trees that have under n nodes. 
+    """
+    all_trees_processed = []
+    
+    logging.info(f'filtering trees under {n} nodes, input count of trees is {len(all_trees)}')
+    for tree in all_trees:
+        if len(tree) >= n:
+            all_trees_processed.append(tree)
+        else:
+            pass
+    logging.info(f'filtered, output count of trees is {len(all_trees_processed)}')
+
+    return all_trees_processed
 
 
 def filter_over_leaf_rate(all_trees) -> list:
@@ -21,12 +34,15 @@ def filter_over_leaf_rate(all_trees) -> list:
 
 
 def filter_under_depth(all_trees, depth) -> list:
-    """:parameter
-    takes a list of tree dictionaries and filter trees that have over % of leaves.
+    """
+    :parameter: all_trees - list of dictionary conversation trees like [{'node_id: node object}]
+    :parameter: depth - the minimum depth of a tree to be included in the dataset 
+    
+    takes a list of tree dictionaries and filter trees that are under the given depth.
     """
     all_trees_processed = []
     
-    logging.info(f'filtering trees under {depth}, input count of trees is {len(all_trees)}')
+    logging.info(f'filtering trees under {depth+1}, input count of trees is {len(all_trees)}')
     for tree in all_trees:
         root = find_root(tree)
         if findall(tree[root], filter_=lambda node: node.depth > 2):
