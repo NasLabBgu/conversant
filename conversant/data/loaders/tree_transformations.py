@@ -6,10 +6,15 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
 
 
 def df2tree(df) -> dict:
+    """ Takes a df with tree information and converts to tree data type
+    
+    Arguments:
+        df {pd.DataFrame} -- conversation dataframe
+    
+    Returns:
+        dict -- dictionary like {'node_id': anytree.node}
     """
-    takes a df with tree information and converts to tree data type
-    returns dict of Nodes of a tree
-    """
+
     if 'clean_text' in df.columns:
         # create Node objects for all instances in the df
         tree = {x.index1: Node(name=x.node_id, tree_id=x.tree_id, index=x.index1, timestamp=x.timestamp,
