@@ -7,19 +7,20 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
 
-def load2df(path, input_format='csv') -> pd.DataFrame:
+def load2df(path: str, input_format='csv') -> pd.DataFrame:
+    """ Reads csv or json file of conversation data, the data should have at least these features
+        'node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'
+    
+    Arguments:
+        path {str} -- path to file
+    
+    Keyword Arguments:
+        input_format {str} -- type of file (string) i.e 'csv', 'json' (default: {'csv'})
+    
+    Returns:
+        pd.DataFrame -- requested conversation data 
     """
-    :parameter path: path to file
-    :parameter input_format: type of file (string) i.e 'csv', 'json'
-    :returns: pandas data frame
 
-    Reads csv or json file of conversation data, the data should have at least these features
-    'node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'
-
-    TODOs:
-        1. support reading multiple files from a folder
-        2. support reading of json file
-    """
     if input_format == 'csv':
         df = pd.read_csv(path)
         df = df.filter(['node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'], axis=1)
@@ -47,19 +48,20 @@ def load2df(path, input_format='csv') -> pd.DataFrame:
     return df
 
 
-def load2anytree(path, input_format='csv') -> list:
+def load2anytree(path: str, input_format='csv') -> list:
+    """ Reads csv or json file of conversation data, the data should have at least these features
+        'node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'
+    
+    Arguments:
+        path {str} -- path to file 
+    
+    Keyword Arguments:
+        input_format {str} -- [description] (default: {'csv'})
+    
+    Returns:
+        list -- list of dictionaries with post id as keys and anytree.Node objects as values.
     """
-    :parameter path: path to file
-    :parameter input_format: type of file (string) i.e 'csv', 'json'
-    :returns: dictionary with post id as keys and Anytree.Node objects as values.
 
-    Reads csv or json file of conversation data, the data should have at least these features
-    'node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'
-
-    TODOs:
-        1. support reading multiple files from a folder
-        2. support reading of json file
-    """
     if input_format == 'csv':
         df = pd.read_csv(path)
         df = df.filter(['node_id', 'tree_id', 'timestamp', 'author', 'text', 'parent'], axis=1)
