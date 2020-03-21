@@ -1,6 +1,6 @@
 import pandas as pd
 import logging
-from .utils import clean_text
+from .text_enrichment import clean_text
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 

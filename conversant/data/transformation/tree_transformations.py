@@ -18,12 +18,12 @@ def df2tree(df: pd.DataFrame) -> dict:
 
     if 'clean_text' in df.columns:
         # create Node objects for all instances in the df
-        tree = {x.index1: Node(name=x.node_id, tree_id=x.tree_id, index=x.index1, timestamp=x.timestamp,
+        tree = {x.post_index: Node(name=x.node_id, tree_id=x.tree_id, post_index=x.post_index, timestamp=x.timestamp,
                                author=x.author, text=x.text, father=x.parent, clean_text=x.clean_text) for i, x in
                 df.iterrows()}
     else:
         # create Node objects for all instances in the df
-        tree = {x.index1: Node(name=x.node_id, tree_id=x.tree_id, index=x.index1, timestamp=x.timestamp,
+        tree = {x.post_index: Node(name=x.node_id, tree_id=x.tree_id, post_index=x.post_index, timestamp=x.timestamp,
                                author=x.author, text=x.text, father=x.parent) for i, x in df.iterrows()}
     # update parents
     for _, v in tree.items():
@@ -31,33 +31,37 @@ def df2tree(df: pd.DataFrame) -> dict:
 
     # drop DeltaBot and his descendents
     ids_to_drop = []
-    for k, v in tree.items():
+    for _, v in tree.items():
         if v.author == 'DeltaBot':
-            ids_to_drop.append(v.index)
-            ids_to_drop.append([c.index for c in v.descendants])
+            ids_to_drop.append(v.post_index)
+            ids_to_drop.append([c.post_index for c in v.descendants])
 
     final_tree = {key: tree[key] for key in tree if key not in ids_to_drop}
 
     return final_tree
 
-def tree2df(tree: dict, features: list) -> pd.DataFrame:
+def tree2df(tree: dict, features: dict) -> pd.DataFrame:
     """ transforms a tree dictionary structure to a pandas dataframe
     
     Arguments:
-        tree {dict} -- [description]
-        features {list} -- [description]
+        tree {dict} -- conversation data in tree dictionary form 
+        features {dict} <optional> -- dictionary containing node features like {'feature_name': function}
     
     Returns:
-        pd.DataFrame -- [description]
+        pd.DataFrame -- pandas dataframe representation of the conversation tree
     """
-    tree_features = {feature: v.__dict__[feature] for feature in features
-                                     for k,v in tree.items()}
 
-    columns=['index1', 'node_id', 'tree_id', 'timestamp',
-     'author', 'text', 'clean_text', 'parent'] + features
+    base_features = {'post_index':  None, 'name': None, 'tree_id': None, 
+                    'timestamp': None, 'author': None, 'text': None,
+                    'father': None, 'label': None}
 
-    df = pd.DataFrame(tree_features, columns)
-    df.index = df.index1
+    features.update(base_features)
+
+    tree_features = [{feature: v.__dict__[feature] for feature in features.keys()}
+                                        for _,v in tree.items()]
+
+    df = pd.DataFrame.from_records(tree_features)
+    df.index = df.post_index
 
     return df
 
