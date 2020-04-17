@@ -1,6 +1,6 @@
 import pandas as pd
 import logging
-from .text_enrichment import clean_text
+from .text_enrichment import clean_text, remove_punctuation
 from anytree import Node
 import tqdm
 
@@ -23,7 +23,26 @@ def clean_text_field(data):
    if isinstance(data, list):
       for tree in tqdm.tqdm(data):
          for _,v in tree.items():
-            v.clean_text = clean_text(v.text)
-
+               v.clean_text = clean_text(v.text)
+               
    logging.info('Added new clean text feature')
+   return data
+
+def remove_punctuation_from_text(data):
+   """ Enriches a dataframe or Anytree structure containing "text" field with "clean text" field
+   See utils.clean_text for more information
+
+   Returns:
+   [pd.DataFrame or dictionary] -- conversations with new clean text field 
+   """
+
+   if isinstance(data, pd.DataFrame):
+      raise NotImplementedError
+
+   if isinstance(data, list):
+      for tree in tqdm.tqdm(data):
+         for _,v in tree.items():
+               v.text = remove_punctuation(v.text)
+            
+   logging.info('Removed punctuation from text')
    return data

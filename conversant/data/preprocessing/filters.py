@@ -70,14 +70,23 @@ def filter_DeltaBot(all_trees: list) -> list:
     """
 
     # drop DeltaBot and his descendents
+    total_dropped = 0
+    new_all_trees = []
+    original_len = 0
+    new_len = 0
     for tree in all_trees:
+        original_len+=len(tree)
         ids_to_drop = []
-        for k, v in tree.items():
+        for _, v in tree.items():
             if v.author == 'DeltaBot':
-                ids_to_drop.append(v.index)
-                ids_to_drop.append([c.index for c in v.descendants])
-
-        tree = {key: tree[key] for key in tree if key not in ids_to_drop}
-    logging.info('conversations are now free of DeltaBot and his descendents')
+                ids_to_drop.append(v.post_index)
+                ids_to_drop.extend([c.post_index for c in v.descendants])  
+        new_tree = {key: tree[key] for key in tree if key not in ids_to_drop}
+        new_all_trees.append(new_tree)
+        new_len += len(new_tree)
+        total_dropped += len(ids_to_drop)
+    logging.info(f'original len {original_len} ')
+    logging.info(f'dropped total of {total_dropped} nodes for relation with DeltaBot')
+    logging.info(f'output len {new_len} ')
     
-    return all_trees
+    return new_all_trees

@@ -1,6 +1,7 @@
 import re
 import os
 import logging
+import string
 import tldextract
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
@@ -17,8 +18,10 @@ def clean_text(text) -> str:
     """
 
     if type(text) is not str:
-        text = ''
-    if text == '[deleted]' or text == '[removed]':
+        text = str(text)
+    if text == '[deleted]':
+        text = '' 
+    if text == '[removed]':
         text = ''
     deltabot_re = re.compile(r'^Confirmed: \d+ delta awarded to .*', re.DOTALL)
     if deltabot_re.match(text):
@@ -61,3 +64,8 @@ def load_liwc():
         liwc_cat_dict[tokens[0]] = tokens[1:]
 
     return liwc_cat_dict
+
+
+def remove_punctuation(text:str) -> str:
+    exclude = set(string.punctuation)
+    return  ''.join(ch for ch in text if ch not in exclude)

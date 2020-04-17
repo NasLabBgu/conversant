@@ -29,16 +29,8 @@ def df2tree(df: pd.DataFrame) -> dict:
     for _, v in tree.items():
         v.parent = None if v.father == -1 else tree[v.father]
 
-    # drop DeltaBot and his descendents
-    ids_to_drop = []
-    for _, v in tree.items():
-        if v.author == 'DeltaBot':
-            ids_to_drop.append(v.post_index)
-            ids_to_drop.append([c.post_index for c in v.descendants])
+    return tree
 
-    final_tree = {key: tree[key] for key in tree if key not in ids_to_drop}
-
-    return final_tree
 
 def tree2df(tree: dict, features: dict) -> pd.DataFrame:
     """ transforms a tree dictionary structure to a pandas dataframe
@@ -55,7 +47,10 @@ def tree2df(tree: dict, features: dict) -> pd.DataFrame:
                     'timestamp': None, 'author': None, 'text': None,
                     'father': None, 'label': None}
 
-    features.update(base_features)
+    if features:
+        features.update(base_features)
+    else:
+        features = base_features
 
     tree_features = [{feature: v.__dict__[feature] for feature in features.keys()}
                                         for _,v in tree.items()]
