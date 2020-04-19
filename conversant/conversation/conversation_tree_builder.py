@@ -1,8 +1,10 @@
-from collections import Iterable, deque
-from typing import Tuple, Any, Dict
+from collections import deque
+from typing import Tuple, Any, Dict, Iterable, List
 
 from conversant.conversation import NodeData, Conversation
 from conversant.conversation.conversation import ConversationNode
+
+EMPTY_SEQUENCE = tuple()
 
 
 def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]]) -> Conversation:
@@ -27,7 +29,7 @@ def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]]) -> Conve
     return build_conversation_from_ordered(ordered_nodes)
 
 
-def sort_nodes_from_children_map(children_map: Dict[Any, Tuple[NodeData, Any, Any]]):
+def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, Any, Any]]]) -> Iterable[Tuple[NodeData, Any, Any]]:
     """
     generate the nodes in children_map ordered from parent to descendants,
     meaning that a node will be generated before its children, not necessarily adjacent to each other.
@@ -40,12 +42,12 @@ def sort_nodes_from_children_map(children_map: Dict[Any, Tuple[NodeData, Any, An
         A generator of triplets (tuple) containing node_data, node_id, parent_id
     """
     # perform topological sorting by performing bfs on 'children_map' starting from the root node.
-    root_node = children_map[None]
-    nodes = deque([root_node])
+    root_node = children_map[None]  # get a children list with a single element which is the root.
+    nodes = deque(root_node)
     while len(nodes) > 0:
         next_node = nodes.pop()
         node_id = next_node[1]
-        [nodes.appendleft(child) for child in children_map[node_id]]
+        [nodes.appendleft(child) for child in children_map.get(node_id, EMPTY_SEQUENCE)]
         yield next_node
 
 

@@ -1,1 +1,1 @@
-from conversant.conversation.conversation import Conversation, NodeData
+from conversant.conversation.conversation import NodeData, ConversationNode, Conversation

@@ -3,8 +3,7 @@ from unittest import TestCase
 
 from anytree import LevelOrderGroupIter
 
-from conversant.conversation import Conversation
-from conversant.conversation.conversation import ConversationNode, NodeData
+from conversant.conversation import NodeData, ConversationNode, Conversation
 from conversant.conversation.conversation_utils import iter_conversation_tree, iter_conversation
 
 
@@ -48,12 +47,8 @@ def generate_conversation_with_ordered_nodes() -> Tuple[Conversation, List[Conve
     n3 = ConversationNode(NodeData(3, "op"), parent=n2)
     n4 = ConversationNode(NodeData(4, "u3"), parent=n2)
     n5 = ConversationNode(NodeData(5, "op"), parent=n1)
-    n6 = ConversationNode(NodeData(1, "u2"), parent=n3)
-    n7 = ConversationNode(NodeData(1, "u1"), parent=n5)
-
-    # for pre, _, node in RenderTree(root):
-    #     treestr = f"{pre}{node.node_data.node_id}"
-    #     print(treestr.ljust(16), node.author)
+    n6 = ConversationNode(NodeData(6, "u2"), parent=n3)
+    n7 = ConversationNode(NodeData(7, "u1"), parent=n5)
 
     nodes_by_dfs_order = [root, n1, n5, n7, n2, n3, n6, n4]
     return Conversation(root), nodes_by_dfs_order
