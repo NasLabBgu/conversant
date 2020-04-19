@@ -79,9 +79,12 @@ def filter_DeltaBot(all_trees: list) -> list:
         ids_to_drop = []
         for _, v in tree.items():
             if v.author == 'DeltaBot':
+                v.children = []
                 ids_to_drop.append(v.post_index)
                 ids_to_drop.extend([c.post_index for c in v.descendants])  
-        new_tree = {key: tree[key] for key in tree if key not in ids_to_drop}
+            else:
+                v.children = [c for c in v.children if c.author != 'DeltaBot']
+        new_tree = {key: tree[key] for key,v in tree.items() if v.post_index not in ids_to_drop}
         new_all_trees.append(new_tree)
         new_len += len(new_tree)
         total_dropped += len(ids_to_drop)
@@ -90,3 +93,4 @@ def filter_DeltaBot(all_trees: list) -> list:
     logging.info(f'output len {new_len} ')
     
     return new_all_trees
+
