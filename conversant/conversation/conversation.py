@@ -1,13 +1,13 @@
-from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any
+from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union
 
 from anytree import NodeMixin
 
 
-class NodeData(NamedTuple, NodeMixin):
+class NodeData(NamedTuple):
     """
     the data each node in the conversation holds.
     """
-    node_id: str = ""
+    node_id: Any = ""
     author: str = ""
     timestamp: int = 0
     data: dict = dict()
@@ -15,11 +15,18 @@ class NodeData(NamedTuple, NodeMixin):
 
 class ConversationNode(NodeMixin):
 
-    def __init__(self, parent: 'ConversationNode' = None, children: List['ConversationNode'] = None, node_data: NodeData = None, **kwargs):
+    def __init__(self, node_data: NodeData = None, parent: 'ConversationNode' = None, children: List['ConversationNode'] = None, **kwargs):
         self.parent = parent
-        self.children = children or []
-        self.node_data = node_data or NodeData()
+        self.__children = children
+        self.__node_data = node_data or NodeData()
         self.node_data.data.update(kwargs)
+
+        if children:
+            self.children = children
+
+    @property
+    def node_data(self) -> NodeData:
+        return self.__node_data
 
     @property
     def node_id(self) -> Any:
@@ -45,6 +52,10 @@ class Conversation(object):
 
     def __init__(self, conversation_tree: ConversationNode):
         self.__tree = conversation_tree
+
+    @property
+    def root(self) -> ConversationNode:
+        return self.__tree
 
     def prune(self, condition: Callable[[NodeData], bool]) -> 'Conversation':
         """

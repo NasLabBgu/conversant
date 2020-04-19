@@ -15,12 +15,27 @@ def prune_authors(conversation: Conversation, authors: Sequence[str]):
     return conversation.prune(filter_func)
 
 
-def iter_conversation(tree: ConversationNode, init_depth: int = 0, max_depth: int = None
+def iter_conversation(conversation: Conversation, init_depth: int = 0, max_depth: int = None
                       ) -> Iterable[Tuple[int, NodeData]]:
+    """
+    walk in DFS style on the given conversation from left to right, and generates pairs of the current depth in the tree with the current node.
+    Args:
+        conversation: the conversation to iterate over
+        init_depth: The depth of the given tree root (it might be a subtree for example).
+        max_depth: Limit the depth of the node to yield.
+
+    Returns:
+
+    """
+    return iter_conversation_tree(conversation.root, init_depth, max_depth)
+
+
+def iter_conversation_tree(tree: ConversationNode, init_depth: int = 0, max_depth: int = None
+                           ) -> Iterable[Tuple[int, NodeData]]:
     """
     walk in DFS style on the given tree from left to right, and generates pairs of the current depth in the tree with the current node.
     Args:
-        tree: the tree to iterate
+        tree: the tree to iterate over
         init_depth: The depth of the given tree root (it might be a subtree for example).
         max_depth: Limit the depth of the node to yield.
 
@@ -32,7 +47,7 @@ def iter_conversation(tree: ConversationNode, init_depth: int = 0, max_depth: in
 
         if (max_depth is None) or (init_depth + 1 < max_depth):
             for subtree in tree.children:
-                yield from iter_conversation(subtree, init_depth=init_depth + 1, max_depth=max_depth)
+                yield from iter_conversation_tree(subtree, init_depth=init_depth + 1, max_depth=max_depth)
 
 
 def iter_conversation_by_(tree: ConversationNode, comparator: Callable[[ConversationNode, ConversationNode], bool]
