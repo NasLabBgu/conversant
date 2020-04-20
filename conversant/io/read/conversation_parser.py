@@ -1,7 +1,8 @@
 import abc
-from typing import IO, Any, TypeVar, Generic, Tuple, Iterable
+from typing import Any, TypeVar, Generic, Tuple, Iterable
 
-from conversant.conversation import NodeData
+from conversant.conversation import NodeData, Conversation
+from conversant.conversation.conversation_tree_builder import build_conversation
 
 K = TypeVar('K')
 T = TypeVar('T')
@@ -51,11 +52,15 @@ class ConversationParser(Generic[K, T], abc.ABC):
         """
         return node_data.node_id
 
-    def parse(self, raw_conversation: K) -> Iterable[Tuple[NodeData, Any, Any]]:
+    def parse(self, raw_conversation: K) -> Conversation:
+        conversation_components = self.__parse_to_triplets(raw_conversation)
+        return build_conversation(conversation_components)
+
+    def __parse_to_triplets(self, raw_conversation: K) -> Iterable[Tuple[NodeData, Any, Any]]:
         """
         iterates a file-like object, extract data from each raw_element from the iteration.
         Args:
-            fd: a file-like object
+            raw_conversation:
 
         Returns:
             iterable of triplets of (node_data, node_id, parent_id)
@@ -65,4 +70,3 @@ class ConversationParser(Generic[K, T], abc.ABC):
             node_id = self.get_node_id(node_data)
             parent_id = self.get_parent_id(node_data)
             yield node_data, node_id, parent_id
-

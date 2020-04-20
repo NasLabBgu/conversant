@@ -1,4 +1,3 @@
-import json
 from typing import Iterable
 
 from anytree import AnyNode
@@ -8,6 +7,7 @@ from conversant.conversation import NodeData
 from conversant.io.read import ConversationParser, AnyTreeConversationParser
 
 JSON = str
+
 
 class CMVConversationReader(ConversationParser[dict, JSON]):
     """
@@ -19,20 +19,23 @@ class CMVConversationReader(ConversationParser[dict, JSON]):
         ... {
         ... 	"node": {
         ...        "text": "this is the content",
-        ...        "id": "dq9m8km",
-        ...        "author": "DangerousHarvey",
-        ...        "timestamp": 1511503414
+        ...        "id": "0",
+        ...        "author": "OP",
+        ...        "timestamp": 123
         ...      },
         ...      "children": [
-        ...         {"node": {"id": "1", "author": "child", "timestamp": 1511503415, "children": []}}
+        ...         {"node": {"id": "1", "author": "child", "timestamp": 124, "children": []}}
         ...     ]
         ...  }
         ... '''
         >>> cmv_parser = CMVConversationReader()
-        >>> print(list(cmv_parser.parse(cmv_json)))
-        [(NodeData(node_id='dq9m8km', author='DangerousHarvey', timestamp=1511503414, data={'text': 'this is the content', 'id': 'dq9m8km', 'author': 'DangerousHarvey', 'timestamp': 1511503414}, parent_id=None), 'dq9m8km', None), (NodeData(node_id='1', author='child', timestamp=1511503415, data={'id': '1', 'author': 'child', 'timestamp': 1511503415, 'children': []}, parent_id='dq9m8km'), '1', 'dq9m8km')]
+        >>> conversation = cmv_parser.parse(cmv_json)
+        >>> print(conversation)
+        OP - 0
+        └── child - 1
 
     """
+
     def __init__(self):
         super(CMVConversationReader, self).__init__()
         self.__anytree_parser = AnyTreeConversationParser(extract_data)

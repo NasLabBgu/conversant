@@ -1,6 +1,6 @@
 from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union
 
-from anytree import NodeMixin
+from anytree import NodeMixin, RenderTree
 
 
 class NodeData(NamedTuple):
@@ -69,4 +69,10 @@ class Conversation(object):
 
         """
         pass
+
+    def __repr__(self) -> str:
+        return str(RenderTree(self.root).by_attr(lambda n: self.__repr_node(n)))
+
+    def __repr_node(self, node: ConversationNode) -> str:
+        return f"{node.author} - {node.node_id}"
 
