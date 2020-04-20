@@ -1,12 +1,11 @@
 import json
 from typing import Iterable
 
-from anytree import NodeMixin, AnyNode
+from anytree import AnyNode
 from anytree.importer import JsonImporter
 
 from conversant.conversation import NodeData
 from conversant.io.read import ConversationParser, AnyTreeConversationParser
-from conversant.io.read.conversation_parser import K, T
 
 JSON = str
 
