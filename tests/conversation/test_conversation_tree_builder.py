@@ -4,7 +4,7 @@ from typing import Tuple, Iterable, Any, List, Dict
 from unittest import TestCase
 
 from conversant.conversation import NodeData
-from conversant.conversation.conversation_tree_builder import build_conversation_from_ordered, build_conversation, \
+from conversant.conversation.conversation_builder import build_conversation_from_ordered, build_conversation, \
     sort_nodes_from_children_map
 from conversant.conversation.conversation_utils import iter_conversation
 

@@ -4,7 +4,7 @@ from anytree import AnyNode
 from anytree.importer import JsonImporter
 
 from conversant.conversation import NodeData
-from conversant.io.read import ConversationParser, AnyTreeConversationParser
+from conversant.conversation.parse import ConversationParser, AnyTreeConversationParser
 
 JSON = str
 

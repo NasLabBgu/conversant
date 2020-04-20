@@ -2,7 +2,7 @@ import abc
 from typing import Any, TypeVar, Generic, Tuple, Iterable
 
 from conversant.conversation import NodeData, Conversation
-from conversant.conversation.conversation_tree_builder import build_conversation
+from conversant.conversation.conversation_builder import build_conversation
 
 K = TypeVar('K')
 T = TypeVar('T')

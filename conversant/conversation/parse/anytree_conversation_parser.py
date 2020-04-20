@@ -1,10 +1,9 @@
 from typing import Iterable, Callable, Union
 
-# import anytree
 from anytree import NodeMixin, AnyNode, Node, PreOrderIter
 
 from conversant.conversation import NodeData
-from conversant.io.read import ConversationParser
+from conversant.conversation.parse import ConversationParser
 
 NodeType = Union[NodeMixin, AnyNode, Node]
 
