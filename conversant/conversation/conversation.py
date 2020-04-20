@@ -11,6 +11,7 @@ class NodeData(NamedTuple):
     author: str = ""
     timestamp: int = 0
     data: dict = dict()
+    parent_id: Any = ""
 
 
 class ConversationNode(NodeMixin):

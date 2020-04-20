@@ -1,5 +1,6 @@
 from typing import Sequence, Iterable, Tuple, Callable
 
+import anytree
 import pandas as pd
 
 from conversant.conversation import Conversation, NodeData
