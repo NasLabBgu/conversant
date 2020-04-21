@@ -3,7 +3,8 @@ from typing import TypeVar, List, Tuple, Any, Iterable, Container
 
 from anytree import NodeMixin
 
-N = TypeVar('N', bound=NodeMixin)
+from conversant.conversation import Conversation, NodeData
+
 T = TypeVar('T')  # interaction value type
 K = TypeVar('K')  # aggregated interactions value type
 
@@ -31,7 +32,7 @@ class InteractionsAggregator(abc.ABC):
         raise NotImplemented
 
     @abc.abstractmethod
-    def extract(self, node: N, branch: List[N], tree: N) -> Iterable[Tuple[Any, Any, T]]:
+    def extract(self, node: NodeData, branch: List[NodeData], tree: Conversation) -> Iterable[Tuple[Any, Any, T]]:
         """
         extract the interaction between any pair of users according to the given node in the tree.
         Args:
