@@ -83,7 +83,7 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Nod
     for depth, node_data in iter_conversation_tree(root):
         # check if the entire current branch was parsed, and start walking to the next branch
         if depth < len(current_branch_nodes):
-            del current_branch_nodes[depth:]
+            del current_branch_nodes[depth:]    # pop all nodes until the common ancestor
 
         current_branch_nodes.append(node_data)
         yield node_data, current_branch_nodes[:]
@@ -99,6 +99,8 @@ def conversation_to_dataframe(conversation: ConversationNode) -> pd.DataFrame:
 
     """
     pass
+
+
 
 
 

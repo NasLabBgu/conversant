@@ -9,7 +9,7 @@ from conversant.conversation.parse import ConversationParser, AnyTreeConversatio
 JSON = str
 
 
-class CMVConversationReader(ConversationParser[dict, JSON]):
+class CMVConversationReader(ConversationParser[str, JSON]):
     """
     parse a cmv conversation written as json.
 

@@ -1,15 +1,15 @@
 import abc
-from typing import TypeVar, List, Tuple, Any, Iterable, Container
+from typing import TypeVar, List, Tuple, Any, Iterable, Generic
 
-from anytree import NodeMixin
 
 from conversant.conversation import Conversation, NodeData
 
 T = TypeVar('T')  # interaction value type
 K = TypeVar('K')  # aggregated interactions value type
+C = TypeVar('C')  # aggregate container data-structure
 
 
-class InteractionsAggregator(abc.ABC):
+class InteractionsAggregator(Generic[T, K, C], abc.ABC):
 
     def __init__(self, interaction_name: str):
         self.__name = interaction_name
@@ -23,7 +23,7 @@ class InteractionsAggregator(abc.ABC):
         return self.__name
 
     @abc.abstractmethod
-    def initialize_interactions_container(self) -> Container:
+    def initialize_interactions_container(self) -> C:
         """
         initialize the data-structure in which the found interactions are aggregated, between a pair of users.
         Returns:
@@ -49,7 +49,7 @@ class InteractionsAggregator(abc.ABC):
         raise NotImplemented
 
     @abc.abstractmethod
-    def add(self, u1: Any, u2: Any, interaction_value: T, container: Container):
+    def add(self, u1: Any, u2: Any, interaction_value: T, container: C):
         """
         adds the value of the interaction from user 'u1' to user 'u2' to the container.
         Args:
@@ -61,7 +61,7 @@ class InteractionsAggregator(abc.ABC):
         raise NotImplemented
 
     @abc.abstractmethod
-    def aggregate(self, container: Container) -> K:
+    def aggregate(self, container: C) -> K:
         """
         takes the container that has aggregated the interactions between a pair of users,
         and transform it into the final interaction value between these users.

@@ -2,11 +2,12 @@ from typing import Any, Dict
 
 from conversant.conversation import Conversation
 from conversant.conversation.conversation_utils import iter_conversation_branches
-from conversant.interactions import InteractionsGraph, InteractionsAggregator
+from conversant.interactions.aggregators import InteractionsAggregator
+from conversant.interactions import InteractionsGraph
 
 
 class InteractionsParser(object):
-    def __init__(self, directed: bool = True, *aggregators: InteractionsAggregator):
+    def __init__(self, *aggregators: InteractionsAggregator, directed: bool = True):
         self.directed = directed
         self.__aggregators: Dict[str, InteractionsAggregator] = {agg.name: agg for agg in aggregators}
 

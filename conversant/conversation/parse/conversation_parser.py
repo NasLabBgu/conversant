@@ -4,8 +4,8 @@ from typing import Any, TypeVar, Generic, Tuple, Iterable
 from conversant.conversation import NodeData, Conversation
 from conversant.conversation.conversation_builder import build_conversation
 
-K = TypeVar('K')
-T = TypeVar('T')
+K = TypeVar('K')    # type of raw conversation
+T = TypeVar('T')    # type of raw_node
 
 
 class ConversationParser(Generic[K, T], abc.ABC):
@@ -53,6 +53,14 @@ class ConversationParser(Generic[K, T], abc.ABC):
         return node_data.node_id
 
     def parse(self, raw_conversation: K) -> Conversation:
+        """
+        takes a raw conversation and build a `Conversation` instance from it.
+        Args:
+            raw_conversation: conversation tree to parse.
+
+        Returns:
+            a `Conversation` that represent the data in the given 'raw_conversation'.
+        """
         conversation_components = self.__parse_to_triplets(raw_conversation)
         return build_conversation(conversation_components)
 
