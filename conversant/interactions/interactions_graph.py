@@ -3,7 +3,7 @@ import anytree
 import pandas as pd
 
 
-class InteractionGraph(object):
+class InteractionsGraph(object):
     def __init__(self, interactions_graph: nx.Graph):
         validate_interaction_graph(interactions_graph)
         self.interactions_graph = interactions_graph
@@ -12,11 +12,11 @@ class InteractionGraph(object):
         pass
 
     @staticmethod
-    def from_anytree(conversation: anytree.Node) -> 'InteractionGraph':
+    def from_anytree(conversation: anytree.Node) -> 'InteractionsGraph':
         return interactions_graph_from_anytree_conversation(conversation)
 
     @staticmethod
-    def from_dataframe(conversation: pd.DataFrame) -> 'InteractionGraph':
+    def from_dataframe(conversation: pd.DataFrame) -> 'InteractionsGraph':
         return interactions_graph_from_dataframe_conversation(conversation)
 
 
@@ -34,10 +34,10 @@ def validate_interaction_graph(interactions_graph: nx.Graph) -> None:
                         f"\nOnly undirected (not multi) graphs are currently supported")
 
 
-def interactions_graph_from_anytree_conversation(conversation: anytree.Node) -> InteractionGraph:
+def interactions_graph_from_anytree_conversation(conversation: anytree.Node) -> InteractionsGraph:
     pass
 
-def interactions_graph_from_dataframe_conversation(conversation: pd.DataFrame) -> InteractionGraph:
+def interactions_graph_from_dataframe_conversation(conversation: pd.DataFrame) -> InteractionsGraph:
     pass
 
 

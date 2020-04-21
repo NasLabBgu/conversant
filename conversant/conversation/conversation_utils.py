@@ -1,4 +1,4 @@
-from typing import Sequence, Iterable, Tuple, Callable
+from typing import Sequence, Iterable, Tuple, Callable, List
 
 import anytree
 import pandas as pd
@@ -67,6 +67,26 @@ def iter_conversation_by_(tree: ConversationNode, comparator: Callable[[Conversa
     """
     #TODO implement dijkstra style iteration - BFS with a priority queue that works with the given comparator
     pass
+
+
+def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[NodeData, List[NodeData]]]:
+    """
+    walk the conversation tree and generate pairs of node and its corresponding branch leading to it.
+    Args:
+        conversation: A conversation to iterate over.
+
+    Returns:
+        Iterable of pairs of NodeData coupled with a list of all nodes in the branch preceding this node.
+    """
+    root = conversation.root
+    current_branch_nodes: List[NodeData] = []     # Stores the previous nodes in the parsed branch
+    for depth, node_data in iter_conversation_tree(root):
+        # check if the entire current branch was parsed, and start walking to the next branch
+        if depth < len(current_branch_nodes):
+            del current_branch_nodes[depth:]
+
+        current_branch_nodes.append(node_data)
+        yield node_data, current_branch_nodes[:]
 
 
 def conversation_to_dataframe(conversation: ConversationNode) -> pd.DataFrame:
