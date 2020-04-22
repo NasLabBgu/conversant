@@ -2,8 +2,8 @@ from typing import Union, Iterable
 
 from conversant.conversation import Conversation, NodeData
 from conversant.conversation.conversation_utils import iter_conversation
-from conversant.examples.cmv_utils import find_user_mentions, strip_mention_prefix, strip_quote_symbols, \
-    is_source_of_quote
+from conversant.examples.cmv.cmv_utils import strip_quote_symbols, is_source_of_quote, find_user_mentions, \
+    strip_mention_prefix
 
 DELTA_BOT_USER = "Del+" \
                  "" \

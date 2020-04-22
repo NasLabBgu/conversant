@@ -1,8 +1,8 @@
 from typing import Any, List, Iterable, Tuple
 
 from conversant.conversation import NodeData, Conversation
-from conversant.examples.cmv_interactions_utils import find_quote_author, check_delta_award, find_award_recipient
-from conversant.examples.cmv_utils import find_user_mentions, strip_mention_prefix, find_quotes
+from conversant.examples.cmv.cmv_interactions_utils import find_quote_author, check_delta_award, find_award_recipient
+from conversant.examples.cmv.cmv_utils import find_user_mentions, strip_mention_prefix, find_quotes
 from conversant.examples.reddit_conversation_parser import CMVConversationReader
 from conversant.interactions import InteractionsParser
 from conversant.interactions.aggregators import CountInteractionsAggregator
