@@ -1,15 +1,17 @@
-from typing import Any, Tuple, Dict, NamedTuple
+from typing import Any, Tuple, Dict, NamedTuple, Mapping
 
 import networkx as nx
 
 
 class PairInteractionsData(dict):
+    MAX_UPDATES = 1
+
     def __init__(self, user1: Any, user2: Any, interactions: Dict[str, Any]):
         super().__init__()
-        self.update({"user1": user1, "user2": user2})
-        self.update(interactions)
+        super().update({"user1": user1, "user2": user2}, )
+        super().update(interactions, )
 
-        self.interaction_names = list(interactions.keys())
+        self.__num_updates = 0
 
     @property
     def user1(self) -> Any:
@@ -21,7 +23,8 @@ class PairInteractionsData(dict):
 
     @property
     def interactions(self) -> Dict[str, Any]:
-        return {interaction: value for interaction, value in self.items() if (interaction != "user1" and interaction!= "user2")}
+        return {interaction: value for interaction, value in self.items() if
+                (interaction != "user1" and interaction != "user2")}
 
     @staticmethod
     def get_empty() -> 'PairInteractionsData':
@@ -30,11 +33,18 @@ class PairInteractionsData(dict):
     def __repr__(self):
         return f"PairInteractionsData(user1={self.user1}, user2={self.user2}, interactions={self.interactions})"
 
-    # def __setitem__(self, key, value):
-    #     raise TypeError("PairInteractionsData is immutable")
-    #
-    # def __delitem__(self, key):
-    #     raise TypeError("PairInteractionsData is immutable")
+    def update(self, __m: Mapping, **kwargs) -> None:
+        if not isinstance(__m, PairInteractionsData):
+            if self.__num_updates == self.MAX_UPDATES:
+                raise TypeError("PairInteractionsData is updatable only with the same type")
+
+        super().update(__m)
+        self.__num_updates += 1
+
+    def __setitem__(self, key, value):
+        raise TypeError("PairInteractionsData is immutable")
+
+    __delitem__ = __setitem__
 
 
 class InteractionsDataGraph(nx.Graph):
@@ -59,7 +69,6 @@ class InteractionsGraph(object):
         self.directed = directed
         self.__graph = interactions_dict_to_graph(interactions_dict, directed)
 
-
     @property
     def graph(self) -> nx.Graph:
         return self.__graph
@@ -76,4 +85,3 @@ def interactions_dict_to_graph(interactions_dict: InteractionsDict, directed: bo
     edgelist = ((pair_data.user1, pair_data.user2, pair_data) for pair_data in interactions_dict.values())
     graph_type = InteractionsDataDiGraph if directed else InteractionsDataGraph
     return nx.from_edgelist(edgelist, graph_type)
-

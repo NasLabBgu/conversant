@@ -1,3 +1,4 @@
+from operator import itemgetter
 from typing import Callable
 
 from conversant.conversation import NodeData
@@ -21,6 +22,7 @@ def filter_users(interactions: InteractionsGraph, condition: Condition, inplace:
         returns an `InteractionsGraph` filtered from the authors that didn't satisfy the condition.
     """
     edges = interactions.graph.edges(data=True)
-    filtered_pairs = filter(condition, map())
+    filtered_pairs = [e for e in edges if condition(e[2])]
+
 
 
