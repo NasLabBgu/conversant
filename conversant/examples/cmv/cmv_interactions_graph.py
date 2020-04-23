@@ -88,9 +88,7 @@ if __name__ == "__main__":
 
     interactions_parser = InteractionsParser(reply_counter, mention_counter, quotes_counter, delta_counter, directed=True)
     interaction_graph = interactions_parser.parse(conversation)
-
-    for u1, u2, data in interaction_graph.graph.edges(data=True):
-        print(f"{u1}\t{u2}\t{data}")
+    [print(i) for i in interaction_graph.interactions]
 
 
 

@@ -31,14 +31,14 @@ class InteractionsParser(object):
 
         # aggregate values and finalize result
         collected_interactions = interactions
-        interactions = {}
+        interactions = []
         for pair_key, pair_data in collected_interactions.items():
             pair_interactions = {}
             for interaction_type, aggregator in self.__aggregators.items():
                 pair_interactions[interaction_type] = aggregator.aggregate(pair_data[interaction_type])
 
             user1, user2 = pair_data[AUTHORS_IDENTIFIERS_FIELD]
-            interactions[pair_key] = PairInteractionsData(user1, user2, pair_interactions)
+            interactions.append(PairInteractionsData(user1, user2, pair_interactions))
 
         return InteractionsGraph(interactions, self.directed)
 
