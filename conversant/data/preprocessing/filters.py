@@ -6,13 +6,17 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
 
-def filter_under_n(all_trees, n: int) -> list:
-    """
-    :parameter: all_trees - list of dictionary conversation trees like [{'node_id: node object}]
-    :parameter: n - the minimum number of nodes accepted in the tree
+def filter_under_n(all_trees: list, n: int) -> list:
+    """ Takes a list of tree dictionaries and filter trees that have under n nodes. 
     
-    takes a list of tree dictionaries and filter trees that have under n nodes. 
+    Arguments:
+        all_trees {list} -- list of dictionary conversation trees like [{'node_id: node object}]
+        n {int} -- the minimum number of nodes accepted in the tree
+    
+    Returns:
+        list -- list of dictionary conversation trees like [{'node_id: node object}] after processing 
     """
+
     all_trees_processed = []
     
     logging.info(f'filtering trees under {n} nodes, input count of trees is {len(all_trees)}')
@@ -27,19 +31,20 @@ def filter_under_n(all_trees, n: int) -> list:
 
 
 def filter_over_leaf_rate(all_trees) -> list:
-    """:parameter
-    takes a list of tree dictionaries and filter trees that have over % of leaves.
-    """
     pass
 
 
-def filter_under_depth(all_trees, depth) -> list:
-    """
-    :parameter: all_trees - list of dictionary conversation trees like [{'node_id: node object}]
-    :parameter: depth - the minimum depth of a tree to be included in the dataset 
+def filter_under_depth(all_trees: list, depth: int) -> list:
+    """ Takes a list of tree dictionaries and filter trees that are under the given depth.
     
-    takes a list of tree dictionaries and filter trees that are under the given depth.
+    Arguments:
+        all_trees {list} -- list of dictionary conversation trees like [{'node_id: node object}]
+        depth {int} -- the minimum depth of a tree to be included in the dataset 
+    
+    Returns:
+        list -- list of dictionary conversation trees like [{'node_id: node object}] after processing 
     """
+
     all_trees_processed = []
     
     logging.info(f'filtering trees under {depth+1}, input count of trees is {len(all_trees)}')
@@ -54,11 +59,16 @@ def filter_under_depth(all_trees, depth) -> list:
     return all_trees_processed
 
 
-def filter_DeltaBot(all_trees) -> list:
-    """:parameter: all_trees - list of dictionary conversation trees
-        takes a list of tree dictionaries and filter posts by DeltaBot
-        and deletes his descendents.
+def filter_DeltaBot(all_trees: list) -> list:
+    """ Takes a list of tree dictionaries and filter posts by 'DeltaBot' and deletes his descendents.
+    
+    Arguments:
+        all_trees {[type]} -- list of dictionary conversation trees like [{'node_id: node object}]
+    
+    Returns:
+        list -- list of dictionary conversation trees like [{'node_id: node object}] after processing 
     """
+
     # drop DeltaBot and his descendents
     for tree in all_trees:
         ids_to_drop = []

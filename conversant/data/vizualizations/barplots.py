@@ -5,13 +5,18 @@ logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
 
-def percentile_plot(percentiles, ylabel, title, color=None):
-    """:returns: prints a percentile plot of some data
-       :parameter: percentiles: dictionary of the form {'string' : float}
-       :parameter: ylabel: text to be placed in the y axis
-       :parameter: title: text to be placed as title
-       :parameter: color: list of strings indicating which bar plot colors to choose
+def percentile_plot(percentiles: dict, ylabel: str, title: str, color=None):
+    """ Prints a percentile plot of some data
+    
+    Arguments:
+        percentiles {dict} -- dictionary of the form {'string' : float}
+        ylabel {str} -- text to be placed in the y axis
+        title {str} -- text to be placed as title
+    
+    Keyword Arguments:
+        color {list} -- list of strings indicating which bar plot colors to choose (default: {None})
     """
+
     fig, ax = plt.subplots(figsize=(10, 5))
 
     if color is None:

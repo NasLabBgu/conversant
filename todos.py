@@ -1,20 +1,5 @@
 
 
-# TODO A conversation is a tree of interactoons between users. interactions can be replies, likes (or upvotes), mentions etc...
-
-# TODO load data from multiple sources and format
-    # TODO Example dataset included in the repo (toy cmv or twitter)
-    # TODO Loaders from multiple formats
-        # todo load_cmv
-        # todo load_twitter
-        # todo ...
-
-# TODO load functions creates a tree in multiple formats:
-    # TODO load into pandas
-    # TODO load into anytree.
-    # TODO define what is the base data structure of a tree.
-    # TODO accepts preprocessing function hook to apply during load on every tree.
-
 # TODO preprocessing on data
     # TODO validate and filter trees.
     # TODO remove moderators and bots replies, and vut or re-link nodes
