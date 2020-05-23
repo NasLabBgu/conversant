@@ -1,6 +1,5 @@
 from typing import Sequence, Iterable, Tuple, Callable, List
 
-import anytree
 import pandas as pd
 
 from conversant.conversation import Conversation, NodeData
@@ -14,41 +13,6 @@ def prune_authors(conversation: Conversation, authors: Sequence[str]):
         return node_data.author not in authors_set
 
     return conversation.prune(filter_func)
-
-
-def iter_conversation(conversation: Conversation, init_depth: int = 0, max_depth: int = None
-                      ) -> Iterable[Tuple[int, NodeData]]:
-    """
-    walk in DFS style on the given conversation from left to right, and generates pairs of the current depth in the tree with the current node.
-    Args:
-        conversation: the conversation to iterate over
-        init_depth: The depth of the given tree root (it might be a subtree for example).
-        max_depth: Limit the depth of the node to yield.
-
-    Returns:
-
-    """
-    return iter_conversation_tree(conversation.root, init_depth, max_depth)
-
-
-def iter_conversation_tree(tree: ConversationNode, init_depth: int = 0, max_depth: int = None
-                           ) -> Iterable[Tuple[int, NodeData]]:
-    """
-    walk in DFS style on the given tree from left to right, and generates pairs of the current depth in the tree with the current node.
-    Args:
-        tree: the tree to iterate over
-        init_depth: The depth of the given tree root (it might be a subtree for example).
-        max_depth: Limit the depth of the node to yield.
-
-    Returns:
-        Generates pairs of tree nodes with their respective depth.
-    """
-    if (max_depth is None) or (init_depth < max_depth):
-        yield init_depth, tree.node_data
-
-        if (max_depth is None) or (init_depth + 1 < max_depth):
-            for subtree in tree.children:
-                yield from iter_conversation_tree(subtree, init_depth=init_depth + 1, max_depth=max_depth)
 
 
 def iter_conversation_by_(tree: ConversationNode, comparator: Callable[[ConversationNode, ConversationNode], bool]
@@ -80,7 +44,7 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Nod
     """
     root = conversation.root
     current_branch_nodes: List[NodeData] = []     # Stores the previous nodes in the parsed branch
-    for depth, node_data in iter_conversation_tree(root):
+    for depth, node_data in root.iter_conversation_tree():
         # check if the entire current branch was parsed, and start walking to the next branch
         if depth < len(current_branch_nodes):
             del current_branch_nodes[depth:]    # pop all nodes until the common ancestor

@@ -45,6 +45,23 @@ class ConversationNode(NodeMixin):
     def data(self) -> dict:
         return self.node_data.data
 
+    def iter_conversation_tree(self, init_depth: int = 0, max_depth: int = None) -> Iterable[Tuple[int, NodeData]]:
+        """
+        walk in DFS style on the given tree from left to right, and generates pairs of the current depth in the tree with the current node.
+        Args:
+            init_depth: The depth of the given tree root (it might be a subtree for example).
+            max_depth: Limit the depth of the node to yield.
+
+        Returns:
+            Generates pairs of tree nodes with their respective depth.
+        """
+        if (max_depth is None) or (init_depth < max_depth):
+            yield init_depth, self.node_data
+
+            if (max_depth is None) or (init_depth + 1 < max_depth):
+                for subtree in self.children:
+                    yield from subtree.iter_conversation_tree(init_depth=init_depth + 1, max_depth=max_depth)
+
 
 class Conversation(object):
     """
@@ -57,6 +74,31 @@ class Conversation(object):
     @property
     def root(self) -> ConversationNode:
         return self.__tree
+
+    @property
+    def participants(self) -> Iterable[Any]:
+        """
+        a collection of all the authors who participate in this conversation.
+        Returns:
+            an
+        """
+        unique_authors = set(node_data.author for _, node_data in self.iter_conversation())
+        return unique_authors
+
+    def iter_conversation(self, init_depth: int = 0, max_depth: int = None
+                          ) -> Iterable[Tuple[int, NodeData]]:
+        """
+        walk in DFS style on the given conversation from left to right, and generates pairs of the current depth in the tree with the current node.
+        Args:
+            conversation: the conversation to iterate over
+            init_depth: The depth of the given tree root (it might be a subtree for example).
+            max_depth: Limit the depth of the node to yield.
+
+        Returns:
+            Generates pairs of tree nodes with their respective depth.
+        """
+        return self.root.iter_conversation_tree(init_depth, max_depth)
+
 
     def prune(self, condition: Callable[[NodeData], bool]) -> 'Conversation':
         """

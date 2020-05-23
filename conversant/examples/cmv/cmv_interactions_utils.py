@@ -1,13 +1,10 @@
 from typing import Union, Iterable
 
 from conversant.conversation import Conversation, NodeData
-from conversant.conversation.conversation_utils import iter_conversation
 from conversant.examples.cmv.cmv_utils import strip_quote_symbols, is_source_of_quote, find_user_mentions, \
     strip_mention_prefix
 
-DELTA_BOT_USER = "Del+" \
-                 "" \
-                 "taBot"
+DELTA_BOT_USER = "DeltaBot"
 CONFIRMED_AWARD_PREFIX = "Confirmed:"
 REJECTED_AWARD_PREFIX = "This delta has been rejected"
 
@@ -30,7 +27,7 @@ def find_quote_author(quote: str,
             if is_source_of_quote(quote_text, node_data[TEXT_FIELD]):
                 return node_data[AUTHOR_FIELD]
 
-    for depth, node in iter_conversation(tree):
+    for depth, node in tree.iter_conversation():
         node_data = node.data
         if quote_timestamp and (node_data[TIMESTAMP_FIELD] >= quote_timestamp):
             continue

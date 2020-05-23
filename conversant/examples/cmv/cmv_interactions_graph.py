@@ -3,9 +3,9 @@ from typing import Any, List, Iterable, Tuple
 from conversant.conversation import NodeData, Conversation
 from conversant.examples.cmv.cmv_interactions_utils import find_quote_author, check_delta_award, find_award_recipient
 from conversant.examples.cmv.cmv_utils import find_user_mentions, strip_mention_prefix, find_quotes
-from conversant.examples.reddit_conversation_parser import CMVConversationReader
 from conversant.interactions import InteractionsParser
 from conversant.interactions.aggregators import CountInteractionsAggregator
+from examples.cmv.reddit_conversation_parser import CMVConversationReader
 
 AUTHOR_FIELD = "author"
 TEXT_FIELD = "text"
@@ -80,6 +80,12 @@ if __name__ == "__main__":
     print(conversation)
 
     print()
+    # participants
+    unique_participants = conversation.participants
+    for author in unique_participants:
+        print(author)
+
+    print()
 
     reply_counter = CountInteractionsAggregator("replies", get_reply_interaction_users)
     mention_counter = CountInteractionsAggregator("mentions", get_mentioned_users)
@@ -89,6 +95,8 @@ if __name__ == "__main__":
     interactions_parser = InteractionsParser(reply_counter, mention_counter, quotes_counter, delta_counter, directed=True)
     interaction_graph = interactions_parser.parse(conversation)
     [print(i) for i in interaction_graph.interactions]
+
+    print(f"len(participants) == graph.order(): {len(unique_participants) == interaction_graph.graph.order()}")
 
 
 
