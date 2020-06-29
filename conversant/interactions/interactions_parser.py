@@ -56,7 +56,7 @@ class InteractionsParser(object):
 def validate_aggregators_names(aggregators: Iterable[InteractionsAggregator]):
     for agg in aggregators:
         if agg.name == AUTHORS_IDENTIFIERS_FIELD:
-            raise ValueError(f"aggregator name can't be ש reserved word: {agg.name}")
+            raise ValueError(f"aggregator name can't be a reserved word: {agg.name}")
 
 
 

@@ -1,18 +1,20 @@
+from collections import UserDict
 from operator import itemgetter
 from typing import Any, Dict, Mapping, Callable, Set, Iterable
 
 import networkx as nx
 
 
-class PairInteractionsData(dict):
+WEIGHT_FIELD = "weight"
+
+class PairInteractionsData(UserDict):
+    # TODO figure out immutability to this class - but only after the networkx graph has beeen initialied
     MAX_UPDATES = 2
 
     def __init__(self, user1: Any, user2: Any, interactions: Dict[str, Any]):
-        super().__init__()
-        super().update({"user1": user1, "user2": user2}, )
-        super().update(interactions, )
-
-        self.__num_updates = 0
+        super(PairInteractionsData, self).__init__()
+        self.data = dict(interactions)
+        self.data.update({"user1": user1, "user2": user2})
 
     @property
     def user1(self) -> Any:
@@ -24,28 +26,21 @@ class PairInteractionsData(dict):
 
     @property
     def interactions(self) -> Dict[str, Any]:
-        return {interaction: value for interaction, value in self.items() if
+        return {interaction: value for interaction, value in self.data.items() if
                 (interaction != "user1" and interaction != "user2")}
 
     @staticmethod
     def get_empty() -> 'PairInteractionsData':
         return PairInteractionsData(None, None, {})
 
+    def set_weight(self, weight: float):
+        self.data[WEIGHT_FIELD] = weight
+
+    def calculate_weight(self, weight: Callable[['PairInteractionsData'], float]):
+        self.data[WEIGHT_FIELD] = weight(self)
+
     def __repr__(self):
         return f"PairInteractionsData(user1={self.user1}, user2={self.user2}, interactions={self.interactions})"
-
-    def update(self, __m: Mapping, **kwargs) -> None:
-        # if not isinstance(__m, PairInteractionsData):
-        if self.__num_updates == self.MAX_UPDATES:
-            raise TypeError("PairInteractionsData is updatable only with the same type")
-
-        super().update(__m)
-        self.__num_updates += 1
-
-    def __setitem__(self, key, value):
-        raise TypeError("PairInteractionsData is immutable")
-
-    __delitem__ = __setitem__
 
 
 class InteractionsDataGraph(nx.Graph):
@@ -69,7 +64,7 @@ Condition = Callable[[PairInteractionsData], bool]
 class InteractionsGraph(object):
     def __init__(self, interactions: Iterable[PairInteractionsData], directed: bool = False):
         self.directed = directed
-        self.__graph = interactions_dict_to_graph(interactions, directed)
+        self.__graph = from_pair_interactions_data(interactions, directed)
 
     @property
     def graph(self) -> nx.Graph:
@@ -78,6 +73,10 @@ class InteractionsGraph(object):
     @property
     def interactions(self) -> Iterable[PairInteractionsData]:
         return map(itemgetter(2), self.graph.edges(data=True))
+
+    def set_interaction_weights(self, weight: Callable[[PairInteractionsData], float]):
+        for _, _, pair_data in self.__graph.edges(data=True):
+            pair_data.calculate_weight(weight)
 
     def filter_users(self, condition: Condition, inplace: bool = False) -> 'InteractionsGraph':
         """
@@ -122,6 +121,7 @@ class InteractionsGraph(object):
                 components = nx.weakly_connected_components(self.__graph)
 
             component_nodes = get_node_component(components, author)
+
         else:
             component_nodes = nx.node_connected_component(self.graph, author)
 
@@ -158,7 +158,7 @@ class InteractionsGraph(object):
         return self.filter_users(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
 
 
-def interactions_dict_to_graph(interactions: Iterable[PairInteractionsData], directed: bool = True) -> nx.Graph:
+def from_pair_interactions_data(interactions: Iterable[PairInteractionsData], directed: bool = True) -> nx.Graph:
     """
     builds a graph where each interaction forms an edge, and the interaction data is preserved as the an edge data.
     Args:
@@ -171,7 +171,8 @@ def interactions_dict_to_graph(interactions: Iterable[PairInteractionsData], dir
     """
     edgelist = ((pair_data.user1, pair_data.user2, pair_data) for pair_data in interactions)
     graph_type = InteractionsDataDiGraph if directed else InteractionsDataGraph
-    return nx.from_edgelist(edgelist, graph_type)
+    graph = nx.from_edgelist(edgelist, graph_type)
+    return graph
 
 
 def get_node_component(components: Iterable[Set[Any]], node: Any) -> Set[Any]:
