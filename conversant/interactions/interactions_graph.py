@@ -1,11 +1,12 @@
 from collections import UserDict
 from operator import itemgetter
-from typing import Any, Dict, Mapping, Callable, Set, Iterable
+from typing import Any, Dict, Callable, Set, Iterable
 
 import networkx as nx
 
 
 WEIGHT_FIELD = "weight"
+
 
 class PairInteractionsData(UserDict):
     # TODO figure out immutability to this class - but only after the networkx graph has beeen initialied
@@ -78,7 +79,7 @@ class InteractionsGraph(object):
         for _, _, pair_data in self.__graph.edges(data=True):
             pair_data.calculate_weight(weight)
 
-    def filter_users(self, condition: Condition, inplace: bool = False) -> 'InteractionsGraph':
+    def filter_interactions(self, condition: Condition, inplace: bool = False) -> 'InteractionsGraph':
         """
         filters author nodes out from the given interactions-graph.
         Args:
@@ -133,11 +134,11 @@ class InteractionsGraph(object):
             # if user1 is contained, then user2 is contained. otherwise the given interaction wouldn't exist.
             return pair.user1 in component_nodes
 
-        return self.filter_users(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+        return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
 
     def get_core_interactions(self, inplace: bool = False) -> 'InteractionsGraph':
         """
-        Reduce the graph to include only authors that interacted with at least to other different authors.
+        Reduce the graph to include only authors that interacted with at least two other different authors.
         Args:
             inplace: if True modify this instance, otherwise create a new instance to return.
 
@@ -152,10 +153,10 @@ class InteractionsGraph(object):
 
         core_nodes = set(core_graph.nodes)
 
-        def is_pair_to_keep(pair: PairInteractionsData) -> bool:
+        def is_interaction_to_keep(pair: PairInteractionsData) -> bool:
             return (pair.user1 in core_nodes) and (pair.user2 in core_nodes)
 
-        return self.filter_users(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+        return self.filter_interactions(condition=is_interaction_to_keep, inplace=inplace)  # inplace always False here.
 
 
 def from_pair_interactions_data(interactions: Iterable[PairInteractionsData], directed: bool = True) -> nx.Graph:
@@ -169,6 +170,7 @@ def from_pair_interactions_data(interactions: Iterable[PairInteractionsData], di
         a new `InteractionGraph` object with the data contained in the given interactions.
 
     """
+    interactions = filter(lambda p: p.user1 != p.user2, interactions)
     edgelist = ((pair_data.user1, pair_data.user2, pair_data) for pair_data in interactions)
     graph_type = InteractionsDataDiGraph if directed else InteractionsDataGraph
     graph = nx.from_edgelist(edgelist, graph_type)

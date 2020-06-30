@@ -10,6 +10,14 @@ C = TypeVar('C')  # aggregate container data-structure
 
 
 class InteractionsAggregator(Generic[T, K, C], abc.ABC):
+    """
+    An abstract class for interactions aggregators that used to parse and collect interactions between pairs of users
+    from the conversation and store it for future use. it is mainly used for building interaction graphs.\n
+    By implementing this abstract class, generics is used with 3 different types:\n
+    - T: interaction value type
+    - K: aggregated interactions value type
+    - C: aggregation container type
+    """
 
     def __init__(self, interaction_name: str):
         self.__name = interaction_name

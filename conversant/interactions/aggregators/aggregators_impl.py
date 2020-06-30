@@ -24,3 +24,5 @@ class CountInteractionsAggregator(InteractionsAggregator[None, int, list]):
 
     def aggregate(self, container: list) -> int:
         return container[0]
+
+
