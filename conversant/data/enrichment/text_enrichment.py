@@ -1,14 +1,27 @@
 import re
+import os
 import logging
+import string
 import tldextract
 logging.basicConfig(format='[%(asctime)s] %(levelname)s %(message)s',
                     datefmt='%d/%m/%Y %H:%M:%S', level=logging.INFO)
 
 
-def clean_text(text):
+def clean_text(text) -> str:
+    """ Preprocesses text into a clean version
+    
+    Arguments:
+        text {str} -- input free text
+    
+    Returns:
+        str -- preprocessed clean text
+    """
+
     if type(text) is not str:
-        text = ''
-    if text == '[deleted]' or text == '[removed]':
+        text = str(text)
+    if text == '[deleted]':
+        text = '' 
+    if text == '[removed]':
         text = ''
     deltabot_re = re.compile(r'^Confirmed: \d+ delta awarded to .*', re.DOTALL)
     if deltabot_re.match(text):
@@ -37,3 +50,22 @@ def clean_text(text):
     text = re.sub('\s+', ' ', text)
     text = text.strip(' ')
     return text
+
+
+def load_liwc():
+    fin = open('./LIWC_Features.txt')
+    lines = fin.readlines()
+    fin.close()
+
+    liwc_cat_dict = {}  # {cat: (w1,w2,w3,...)}
+
+    for line in lines[1:]:  # first line is a comment about the use of *
+        tokens = line.strip().lower().split(', ')
+        liwc_cat_dict[tokens[0]] = tokens[1:]
+
+    return liwc_cat_dict
+
+
+def remove_punctuation(text:str) -> str:
+    exclude = set(string.punctuation)
+    return  ''.join(ch for ch in text if ch not in exclude)
