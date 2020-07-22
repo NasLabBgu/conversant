@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_learning_curves(x:str, y:str, hue:str, data:pd.DataFrame, title:str, xticks:list = [], fix_y_axis=False):
+def plot_learning_curves(x:str, y:str, hue:str, data:pd.DataFrame, title:str, x_label:str, y_label:str, xticks:list = [], fix_y_axis=False):
     """ Plotting learning curves
     
     Arguments:
@@ -23,4 +23,6 @@ def plot_learning_curves(x:str, y:str, hue:str, data:pd.DataFrame, title:str, xt
     plt.xticks(rotation=90)
     sns.pointplot(x=x, y=y, hue=hue, data=data, ax=ax)
     plt.title(title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.show()
