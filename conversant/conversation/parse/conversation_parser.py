@@ -7,7 +7,7 @@ from conversant.conversation.conversation_builder import build_conversation
 K = TypeVar('K')    # type of raw conversation
 T = TypeVar('T')    # type of raw_node
 
-
+# TODO - document explicitly that parent id of root must be None-type
 class ConversationParser(Generic[K, T], abc.ABC):
     """
     An interface for a conversation reader instance that reads a conversation from a file.
@@ -73,8 +73,22 @@ class ConversationParser(Generic[K, T], abc.ABC):
         Returns:
             iterable of triplets of (node_data, node_id, parent_id)
         """
+        root_found = False
         for raw_node in self.iter_raw_nodes(raw_conversation):
             node_data = self.extract_node_data(raw_node)
             node_id = self.get_node_id(node_data)
             parent_id = self.get_parent_id(node_data)
+            if parent_id is None:
+                if root_found:
+                    raise ValueError("Multiple roots found (i.e nodes with None as a parent_id). Only a single root is allowed")
+
+                root_found = True
+
             yield node_data, node_id, parent_id
+
+        if not root_found:
+            raise ValueError(
+                "No root found (i.e node with None as a parent_id)"
+            )
+
+# TODO class for multiRootException

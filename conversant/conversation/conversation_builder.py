@@ -47,7 +47,7 @@ def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, An
     while len(nodes) > 0:
         next_node = nodes.pop()
         node_id = next_node[1]
-        [nodes.appendleft(child) for child in children_map.get(node_id, EMPTY_SEQUENCE)]
+        [nodes.appendleft(child) for child in children_map.get(node_id, EMPTY_SEQUENCE)] # TODO explain code
         yield next_node
 
 
