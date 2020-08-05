@@ -1,8 +1,8 @@
 from typing import List, Iterable, Tuple, Any
 
-from conversation import Conversation, NodeData
-from interactions import InteractionsParser
-from interactions.aggregators import CountInteractionsAggregator
+from conversant.conversation import Conversation, NodeData
+from conversant.interactions import InteractionsParser
+from conversant.interactions.aggregators import CountInteractionsAggregator
 
 
 def get_reply_interaction_users(node: NodeData, branch: List[NodeData], conversation: Conversation) -> Iterable[Tuple[Any, Any]]:
