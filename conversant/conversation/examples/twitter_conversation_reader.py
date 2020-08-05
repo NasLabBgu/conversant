@@ -3,10 +3,9 @@ from typing import Iterable, List, Tuple, Any
 import pandas as pd
 from IPython.core.display import display
 
-from conversation import NodeData, Conversation
+from conversation import NodeData
 from conversation.parse import ConversationParser
-from interactions import InteractionsParser, InteractionsGraph
-from interactions.aggregators import CountInteractionsAggregator
+from interactions.reply_interactions_parser import get_reply_interactions_parser
 
 
 class Twitterconversationreader(ConversationParser[pd.DataFrame, pd.Series]):
@@ -40,14 +39,16 @@ def get_reply_interaction_users(node: NodeData, branch: List[NodeData], *args) -
     return [(node.author, parent_author)]
 
 
-class TwitterInteractionGraphBuilder(object):
-    def __init__(self):
-        reply_counter = CountInteractionsAggregator("replies", get_reply_interaction_users)
+# class TwitterInteractionGraphBuilder(object):
+#     def __init__(self):
+#         reply_counter = CountInteractionsAggregator("replies", get_reply_interaction_users)
+#
+#         self.__interactions_parser = InteractionsParser(reply_counter, directed=False)
+#
+#     def build(self, conversation: Conversation) -> InteractionsGraph:
+#         return self.__interactions_parser.parse(conversation)
 
-        self.__interactions_parser = InteractionsParser(reply_counter, directed=False)
-
-    def build(self, conversation: Conversation) -> InteractionsGraph:
-        return self.__interactions_parser.parse(conversation)
+reply_interactions_parser = get_reply_interactions_parser()
 
 
 if __name__ == "__main__":
@@ -69,5 +70,8 @@ if __name__ == "__main__":
     twitter_reader = Twitterconversationreader()
     conversation = twitter_reader.parse(sample)
     print(f"number of participants: {len(list(conversation.participants))}")
+
+    ig = reply_interactions_parser.parse(conversation)
+    print(ig)
 
     display(sample.loc[sample["id_str"] == "1203416002626805765"]["user_id_str"])
