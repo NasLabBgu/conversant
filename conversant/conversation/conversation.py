@@ -2,6 +2,9 @@ from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, U
 
 from anytree import NodeMixin, RenderTree
 
+from interactions import InteractionsGraph
+from interactions.reply_interactions_parser import get_reply_interactions_parser
+
 
 class NodeData(NamedTuple):
     """
@@ -70,6 +73,7 @@ class Conversation(object):
 
     def __init__(self, conversation_tree: ConversationNode):
         self.__tree = conversation_tree
+        self.reply_interactions_parser = get_reply_interactions_parser()
 
     @property
     def root(self) -> ConversationNode:
@@ -111,6 +115,13 @@ class Conversation(object):
 
         """
         pass
+
+    def get_reply_interactions_graph(self) -> InteractionsGraph:
+        """
+        generates an interactions graph based on the replies between authors in the conversation.
+        Returns: interactions graph that considers only replies.
+        """
+        return self.reply_interactions_parser.parse(self)
 
     def __repr__(self) -> str:
         return str(RenderTree(self.root).by_attr(lambda n: self.__repr_node(n)))

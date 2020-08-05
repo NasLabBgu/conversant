@@ -1,11 +1,12 @@
-from typing import Iterable
+from typing import Iterable, List, Tuple, Any
 
 import pandas as pd
 from IPython.core.display import display
 
-from conversation import NodeData
+from conversation import NodeData, Conversation
 from conversation.parse import ConversationParser
-
+from interactions import InteractionsParser, InteractionsGraph
+from interactions.aggregators import CountInteractionsAggregator
 
 
 class Twitterconversationreader(ConversationParser[pd.DataFrame, pd.Series]):
@@ -26,10 +27,27 @@ class Twitterconversationreader(ConversationParser[pd.DataFrame, pd.Series]):
 
         return NodeData(node_id, author, timestamp, data, parent_id)
 
-
     def iter_raw_nodes(self, raw_conversation: pd.DataFrame) -> Iterable[pd.Series]:
         for x in raw_conversation.iterrows():
             yield x[1]
+
+
+def get_reply_interaction_users(node: NodeData, branch: List[NodeData], *args) -> Iterable[Tuple[Any, Any]]:
+    if len(branch) < 2:
+        return []
+
+    parent_author = branch[-2].author
+    return [(node.author, parent_author)]
+
+
+class TwitterInteractionGraphBuilder(object):
+    def __init__(self):
+        reply_counter = CountInteractionsAggregator("replies", get_reply_interaction_users)
+
+        self.__interactions_parser = InteractionsParser(reply_counter, directed=False)
+
+    def build(self, conversation: Conversation) -> InteractionsGraph:
+        return self.__interactions_parser.parse(conversation)
 
 
 if __name__ == "__main__":
