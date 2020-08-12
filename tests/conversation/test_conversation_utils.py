@@ -4,7 +4,8 @@ from unittest import TestCase
 from anytree import LevelOrderGroupIter
 
 from conversant.conversation import NodeData, ConversationNode, Conversation
-from conversation.conversation_utils import iter_conversation_branches, iter_conversation_by_timestamp
+from conversation.conversation_utils import iter_conversation_branches, iter_conversation_by_timestamp, \
+    conversation_to_dataframe
 
 
 class ConversationUtilsTest(TestCase):
@@ -66,20 +67,26 @@ class ConversationUtilsTest(TestCase):
             self.assertTrue(node.timestamp >= prev_timestamp)
 
 
+    def test_conversation_to_dataframe(self):
+        conversation, _ = generate_conversation_with_ordered_nodes()
+        df = conversation_to_dataframe(conversation)
+        print(df)
+
+
 def generate_conversation_with_ordered_nodes() -> Tuple[Conversation, List[ConversationNode]]:
     """
     creates a toy conversation for testing
     Returns:
         a toy Conversation object
     """
-    root = ConversationNode(NodeData(0, "op", parent_id=None, timestamp=0))
-    n1 = ConversationNode(NodeData(1, "u1", parent_id=0, timestamp=1), parent=root)
-    n2 = ConversationNode(NodeData(2, "u2", parent_id=0), parent=root, timestamp=2)
-    n3 = ConversationNode(NodeData(3, "op", parent_id=2), parent=n2, timestamp=3)
-    n4 = ConversationNode(NodeData(4, "u3", parent_id=2), parent=n2, timestamp=4)
-    n5 = ConversationNode(NodeData(5, "op", parent_id=1), parent=n1, timestamp=5)
-    n6 = ConversationNode(NodeData(6, "u2", parent_id=3), parent=n3, timestamp=6)
-    n7 = ConversationNode(NodeData(7, "u1", parent_id=5), parent=n5, timestamp=7)
+    root = ConversationNode(NodeData(0, "op", parent_id=None, timestamp=0, data={"a": 0}))
+    n1 = ConversationNode(NodeData(1, "u1", parent_id=0, timestamp=1, data={"a": 1}), parent=root)
+    n2 = ConversationNode(NodeData(2, "u2", parent_id=0, data={"a": 2}), parent=root, timestamp=2)
+    n3 = ConversationNode(NodeData(3, "op", parent_id=2, data={"a": 3}), parent=n2, timestamp=3, )
+    n4 = ConversationNode(NodeData(4, "u3", parent_id=2, data={"a": 4}), parent=n2, timestamp=4)
+    n5 = ConversationNode(NodeData(5, "op", parent_id=1, data={"a": 5}), parent=n1, timestamp=5)
+    n6 = ConversationNode(NodeData(6, "u2", parent_id=3, data={"a": 6}), parent=n3, timestamp=6)
+    n7 = ConversationNode(NodeData(7, "u1", parent_id=5, data={"a": 7}), parent=n5, timestamp=7)
 
     nodes_by_dfs_order = [root, n1, n5, n7, n2, n3, n6, n4]
     return Conversation(root), nodes_by_dfs_order

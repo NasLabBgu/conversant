@@ -1,10 +1,14 @@
 import heapq
-from typing import Sequence, Iterable, Tuple, Callable, List
+from typing import Sequence, Iterable, Tuple, Callable, List, Dict, Any, Union
 
 import pandas as pd
 
 from conversant.conversation import Conversation, NodeData
 from conversant.conversation.conversation import ConversationNode
+
+
+# NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_leaf", "timestamp"]
+NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "timestamp"]
 
 
 def prune_authors(conversation: Conversation, authors: Sequence[str]):
@@ -58,18 +62,117 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Nod
         yield node_data, current_branch_nodes[:]
 
 
-def conversation_to_dataframe(conversation: ConversationNode) -> pd.DataFrame:
+def conversation_to_dataframe(conversation: Conversation, data_fields: List[str] = None) -> pd.DataFrame:
     """
 
     Args:
-        conversation:
+        conversation: the conversation to converat into a DataFrame
+        data_fields: a list fields from the node's data to include in the DataFrame.
+                The node's data is a dict and to include a deeper field
+                the string should be the path to that field, separated by dots.
 
     Returns:
 
+
     """
-    pass
+    # path is also available if needed
+    records = (
+        {
+            **get_base_data(node, depth),
+            **extract_node_data(node.data, data_fields)
+         }
+        for depth, node in conversation.iter_conversation()
+    )
+    return pd.DataFrame.from_records(records, index="node_id")
 
 
+def get_base_data(n: NodeData, depth: int) -> Dict[str, Union[str, int, bool]]:
+    base_values = [n.node_id, n.author, n.parent_id, depth, n.timestamp]
+    return dict(zip(NODE_RECORD_BASE_FIELDS, base_values))
 
 
+def extract_node_data(data: dict, fields: List[str] = None) -> Dict[str, Any]:
+    flat_data = flatten_dict(data) if fields is None \
+        else extract_data_from_fields(data, fields)
+
+    return {f"data.{k}": v for k, v in flat_data.items()}
+
+
+def extract_data_from_fields(data: dict, fields: List[str]) -> Dict[str, Any]:
+    """
+    extract the data according to the given fields. each field might be recursive, separated by dots
+    Args:
+        data:
+        fields:
+
+    Returns: a new dictionary with the given fields and the corresponding values.
+
+    >>> d = {"a": 1, "b": 2, "c": {"x": 7, "y": 9}}
+    >>> extract_data_from_fields(d, ["a", "c.x"])
+    {'a': 1, 'c.x': 7}
+    """
+    flat_data = {}
+    for f in fields:
+        path = f.split(".")
+        value = data
+        for p in path:
+            value = value[p]
+
+        flat_data[f] = value
+
+    return flat_data
+
+
+def flatten_dict(data: dict, prefix: str = None) -> Dict[str, Any]:
+    """
+    extract all data from a dict, recursively, and return it flattened - without inner dictionaries.
+    recursive fields are marked with their path from the root separated by dots.
+    Args:
+        data: the dict to parse
+
+    Returns: flattened dict
+    >>> d = {"a": 1, "b": 1}
+    >>> flatten_dict(d)
+    {'a': 1, 'b': 1}
+
+    >>> d["c"] = {"x": 3}
+    >>> flatten_dict(d)
+    {'a': 1, 'b': 1, 'c.x': 3}
+    """
+    if prefix is not None:
+        prefix += "."
+    else:
+        prefix = ""
+
+    flat_data = {}
+    for k, v in data.items():
+        field_name = f"{prefix}{k}"
+        if isinstance(v, dict):
+            subdata = flatten_dict(v, prefix=field_name)
+            flat_data.update(subdata)
+            continue
+
+        flat_data[field_name] = v
+
+    return flat_data
+
+
+def extract_all_fields(data: dict) -> List[str]:
+    """
+    extract all fields from a dict, recursively.
+    recursive fields are marked with their path from the root separated by dots.
+    Args:
+        data: the dict to parse
+
+    Returns: list of fields in the dict
+
+    >>> d = {"a": 1, "b": 1}
+    >>> extract_all_fields(d)
+    ['a', 'b']
+
+    >>> d["c"] = {"x": 3}
+    >>> extract_all_fields(d)
+    ['a', 'b', 'c.x']
+    """
+    return list(flatten_dict(data).keys())
 
