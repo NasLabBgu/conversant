@@ -4,19 +4,19 @@ from unittest import TestCase
 from anytree import LevelOrderGroupIter
 
 from conversant.conversation import NodeData, ConversationNode, Conversation
-from conversant.conversation.conversation_utils import iter_conversation_tree, iter_conversation, iter_conversation_branches
+from conversation.conversation_utils import iter_conversation_branches, iter_conversation_by_timestamp
 
 
 class ConversationUtilsTest(TestCase):
 
     def test_iter_conversation(self):
         conversation, nodes_by_dfs_order = generate_conversation_with_ordered_nodes()
-        iteration = list(iter_conversation(conversation))
+        iteration = list(conversation.iter_conversation())
         self.iter_conversation_tree_test_util(conversation.root, nodes_by_dfs_order, iteration)
 
     def test_iter_conversation_tree(self):
         conversation, nodes_by_dfs_order = generate_conversation_with_ordered_nodes()
-        iteration = list(iter_conversation_tree(conversation.root))
+        iteration = list(conversation.root.iter_conversation_tree())
         self.iter_conversation_tree_test_util(conversation.root, nodes_by_dfs_order, iteration)
 
     def iter_conversation_tree_test_util(self,
@@ -36,7 +36,7 @@ class ConversationUtilsTest(TestCase):
 
     def test_walk_branches(self):
         conversation, nodes_by_dfs_order = generate_conversation_with_ordered_nodes()
-        expected_depths, expected_nodes = zip(*list(iter_conversation(conversation)))
+        expected_depths, expected_nodes = zip(*list(conversation.iter_conversation()))
 
         iteration = list(iter_conversation_branches(conversation))
         actual_nodes, branches = zip(*iteration)
@@ -59,6 +59,12 @@ class ConversationUtilsTest(TestCase):
                     self.assertEqual(current_node.parent_id, reversed_branch[i + 1].node_id)
                     current_node = reversed_branch[i + 1]
 
+    def test_iter_conversation_by_timestamp(self):
+        conversation, _ = generate_conversation_with_ordered_nodes()
+        prev_timestamp = 0
+        for depth, node in iter_conversation_by_timestamp(conversation.root):
+            self.assertTrue(node.timestamp >= prev_timestamp)
+
 
 def generate_conversation_with_ordered_nodes() -> Tuple[Conversation, List[ConversationNode]]:
     """
@@ -66,14 +72,14 @@ def generate_conversation_with_ordered_nodes() -> Tuple[Conversation, List[Conve
     Returns:
         a toy Conversation object
     """
-    root = ConversationNode(NodeData(0, "op", parent_id=None))
-    n1 = ConversationNode(NodeData(1, "u1", parent_id=0), parent=root)
-    n2 = ConversationNode(NodeData(2, "u2", parent_id=0), parent=root)
-    n3 = ConversationNode(NodeData(3, "op", parent_id=2), parent=n2)
-    n4 = ConversationNode(NodeData(4, "u3", parent_id=2), parent=n2)
-    n5 = ConversationNode(NodeData(5, "op", parent_id=1), parent=n1)
-    n6 = ConversationNode(NodeData(6, "u2", parent_id=3), parent=n3)
-    n7 = ConversationNode(NodeData(7, "u1", parent_id=5), parent=n5)
+    root = ConversationNode(NodeData(0, "op", parent_id=None, timestamp=0))
+    n1 = ConversationNode(NodeData(1, "u1", parent_id=0, timestamp=1), parent=root)
+    n2 = ConversationNode(NodeData(2, "u2", parent_id=0), parent=root, timestamp=2)
+    n3 = ConversationNode(NodeData(3, "op", parent_id=2), parent=n2, timestamp=3)
+    n4 = ConversationNode(NodeData(4, "u3", parent_id=2), parent=n2, timestamp=4)
+    n5 = ConversationNode(NodeData(5, "op", parent_id=1), parent=n1, timestamp=5)
+    n6 = ConversationNode(NodeData(6, "u2", parent_id=3), parent=n3, timestamp=6)
+    n7 = ConversationNode(NodeData(7, "u1", parent_id=5), parent=n5, timestamp=7)
 
     nodes_by_dfs_order = [root, n1, n5, n7, n2, n3, n6, n4]
     return Conversation(root), nodes_by_dfs_order

@@ -72,6 +72,7 @@ if __name__ == "__main__":
     print(f"number of participants: {len(list(conversation.participants))}")
 
     ig = reply_interactions_parser.parse(conversation)
+    ig.get_core_interactions()
     print(ig)
 
     display(sample.loc[sample["id_str"] == "1203416002626805765"]["user_id_str"])

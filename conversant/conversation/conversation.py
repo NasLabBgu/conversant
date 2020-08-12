@@ -24,7 +24,7 @@ class ConversationNode(NodeMixin):
         self.node_data.data.update(kwargs)
 
         if children:
-            self.children = children
+            self.children = tuple(children)
 
     @property
     def node_data(self) -> NodeData:
@@ -46,6 +46,9 @@ class ConversationNode(NodeMixin):
     def data(self) -> dict:
         return self.node_data.data
 
+    def get_children(self) -> Tuple['ConversationNode']:
+        return self.children
+
     def iter_conversation_tree(self, init_depth: int = 0, max_depth: int = None) -> Iterable[Tuple[int, NodeData]]:
         """
         walk in DFS style on the given tree from left to right, and generates pairs of the current depth in the tree with the current node.
@@ -62,6 +65,10 @@ class ConversationNode(NodeMixin):
             if (max_depth is None) or (init_depth + 1 < max_depth):
                 for subtree in self.children:
                     yield from subtree.iter_conversation_tree(init_depth=init_depth + 1, max_depth=max_depth)
+
+
+    def __lt__(self, other: 'ConversationNode'):
+        return self.timestamp < other.timestamp
 
 
 class Conversation(object):

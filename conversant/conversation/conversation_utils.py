@@ -1,3 +1,4 @@
+import heapq
 from typing import Sequence, Iterable, Tuple, Callable, List
 
 import pandas as pd
@@ -15,22 +16,26 @@ def prune_authors(conversation: Conversation, authors: Sequence[str]):
     return conversation.prune(filter_func)
 
 
-def iter_conversation_by_(tree: ConversationNode, comparator: Callable[[ConversationNode, ConversationNode], bool]
-                          ) -> Iterable[Tuple[int, NodeData]]:
+def iter_conversation_by_timestamp(root: ConversationNode, initial_depth: int = 0) -> Iterable[Tuple[int, NodeData]]:
     """
     walk the conversation tree by a custom order determined by node_comparator.
     Args:
         tree:
             the tree to iterate
-        comparator: a callable that makes comparisons between two 'ConversationNode's. returns a positive value if the
-            first argument is smaller than the second, negative value if the opposite is true
-            and 0 if they are equal.
+        initial_depth:
 
     Returns:
         Generates pairs of tree nodes with their respective depth.
     """
-    #TODO implement dijkstra style iteration - BFS with a priority queue that works with the given comparator
-    pass
+    root_ts = root.timestamp
+    nodes = [(root_ts, (initial_depth, root))]  # list of triplets of the form (timestamp, depth, node)
+    while len(nodes) > 0:
+        ts, (depth, next_node) = heapq.heappop(nodes)
+        child_depth = depth + 1
+        for c in next_node.get_children():
+            heapq.heappush(nodes, (c.timestamp, (child_depth, c)))
+
+        yield depth, next_node
 
 
 def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[NodeData, List[NodeData]]]:
