@@ -1,3 +1,4 @@
+import weakref
 from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union
 
 from anytree import NodeMixin, RenderTree
@@ -21,7 +22,7 @@ class ConversationNode(NodeMixin):
         self.parent = parent
         self.__children = children
         self.__node_data = node_data or NodeData()
-        self.node_data.data.update(kwargs)
+        self.__node_data.data.update(kwargs)
 
         if children:
             self.children = tuple(children)
@@ -33,6 +34,13 @@ class ConversationNode(NodeMixin):
     @property
     def node_id(self) -> Any:
         return self.node_data.node_id
+
+    @property
+    def parent_id(self) -> Any:
+        if self.parent is None:
+            return None
+
+        return self.parent.node_id
 
     @property
     def author(self) -> str:
@@ -49,7 +57,7 @@ class ConversationNode(NodeMixin):
     def get_children(self) -> Tuple['ConversationNode']:
         return self.children
 
-    def iter_conversation_tree(self, init_depth: int = 0, max_depth: int = None) -> Iterable[Tuple[int, NodeData]]:
+    def iter_conversation_tree(self, init_depth: int = 0, max_depth: int = None) -> Iterable[Tuple[int, 'ConversationNode']]:
         """
         walk in DFS style on the given tree from left to right, and generates pairs of the current depth in the tree with the current node.
         Args:
@@ -60,7 +68,7 @@ class ConversationNode(NodeMixin):
             Generates pairs of tree nodes with their respective depth.
         """
         if (max_depth is None) or (init_depth < max_depth):
-            yield init_depth, self.node_data
+            yield init_depth, self
 
             if (max_depth is None) or (init_depth + 1 < max_depth):
                 for subtree in self.children:
@@ -94,7 +102,7 @@ class Conversation(object):
         return unique_authors
 
     def iter_conversation(self, init_depth: int = 0, max_depth: int = None
-                          ) -> Iterable[Tuple[int, NodeData]]:
+                          ) -> Iterable[Tuple[int, ConversationNode]]:
         """
         walk in DFS style on the given conversation from left to right, and generates pairs of the current depth in the tree with the current node.
         Args:

@@ -27,7 +27,7 @@ class ConversationUtilsTest(TestCase):
                                          ):
         depths, nodes = zip(*iteration_result)
         for expected_node, actual_node in zip(nodes_by_dfs_order, nodes):
-            self.assertEqual(expected_node.node_data, actual_node)
+            self.assertEqual(expected_node, actual_node)
 
         depth_groups = [[node for node in children] for children in LevelOrderGroupIter(tree)]
         depth_mapping = {node_data: i for i in range(len(depth_groups)) for node_data in depth_groups[i]}
@@ -48,7 +48,7 @@ class ConversationUtilsTest(TestCase):
         self.assertListEqual(list(expected_depths), actual_depth)
 
         # deeper test
-        root = conversation.root.node_data
+        root = conversation.root
         for node, branch in iteration:
             current_node = node
             reversed_branch = list(reversed(branch))
@@ -65,7 +65,6 @@ class ConversationUtilsTest(TestCase):
         prev_timestamp = 0
         for depth, node in iter_conversation_by_timestamp(conversation.root):
             self.assertTrue(node.timestamp >= prev_timestamp)
-
 
     def test_conversation_to_dataframe(self):
         conversation, _ = generate_conversation_with_ordered_nodes()

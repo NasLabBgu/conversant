@@ -7,8 +7,8 @@ from conversant.conversation import Conversation, NodeData
 from conversant.conversation.conversation import ConversationNode
 
 
-# NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_leaf", "timestamp"]
-NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "timestamp"]
+NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_leaf", "timestamp"]
+# NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "timestamp"]
 
 
 def prune_authors(conversation: Conversation, authors: Sequence[str]):
@@ -20,7 +20,7 @@ def prune_authors(conversation: Conversation, authors: Sequence[str]):
     return conversation.prune(filter_func)
 
 
-def iter_conversation_by_timestamp(root: ConversationNode, initial_depth: int = 0) -> Iterable[Tuple[int, NodeData]]:
+def iter_conversation_by_timestamp(root: ConversationNode, initial_depth: int = 0) -> Iterable[Tuple[int, ConversationNode]]:
     """
     walk the conversation tree by a custom order determined by node_comparator.
     Args:
@@ -42,7 +42,7 @@ def iter_conversation_by_timestamp(root: ConversationNode, initial_depth: int = 
         yield depth, next_node
 
 
-def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[NodeData, List[NodeData]]]:
+def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[ConversationNode, List[ConversationNode]]]:
     """
     walk the conversation tree and generate pairs of node and its corresponding branch leading to it.
     Args:
@@ -53,13 +53,13 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Nod
     """
     root = conversation.root
     current_branch_nodes: List[NodeData] = []     # Stores the previous nodes in the parsed branch
-    for depth, node_data in root.iter_conversation_tree():
+    for depth, node in root.iter_conversation_tree():
         # check if the entire current branch was parsed, and start walking to the next branch
         if depth < len(current_branch_nodes):
             del current_branch_nodes[depth:]    # pop all nodes until the common ancestor
 
-        current_branch_nodes.append(node_data)
-        yield node_data, current_branch_nodes[:]
+        current_branch_nodes.append(node)
+        yield node, current_branch_nodes[:]
 
 
 def conversation_to_dataframe(conversation: Conversation, data_fields: List[str] = None) -> pd.DataFrame:
@@ -78,16 +78,18 @@ def conversation_to_dataframe(conversation: Conversation, data_fields: List[str]
     # path is also available if needed
     records = (
         {
-            **get_base_data(node, depth),
+            **get_base_data(node),
             **extract_node_data(node.data, data_fields)
          }
-        for depth, node in conversation.iter_conversation()
+        for _, node in conversation.iter_conversation()
     )
     return pd.DataFrame.from_records(records, index="node_id")
 
 
-def get_base_data(n: NodeData, depth: int) -> Dict[str, Union[str, int, bool]]:
-    base_values = [n.node_id, n.author, n.parent_id, depth, n.timestamp]
+def get_base_data(n: ConversationNode) -> Dict[str, Union[str, int, bool]]:
+    NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_leaf", "timestamp"]
+    parent_id = None if n.parent is None else n.parent.node_id
+    base_values = [n.node_id, n.author, parent_id, n.depth, n.is_root, n.is_leaf, n.timestamp]
     return dict(zip(NODE_RECORD_BASE_FIELDS, base_values))
 
 

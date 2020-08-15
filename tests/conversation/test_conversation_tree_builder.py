@@ -3,10 +3,13 @@ from random import shuffle
 from typing import Tuple, Iterable, Any, List, Dict
 from unittest import TestCase
 
+import networkx as nx
+from matplotlib import pyplot
+
 from conversant.conversation import NodeData
 from conversant.conversation.conversation_builder import build_conversation_from_ordered, build_conversation, \
     sort_nodes_from_children_map
-from conversant.conversation.conversation_utils import iter_conversation
+from interactions.reply_interactions_parser import get_reply_interactions_parser
 
 
 class ConversationBuilderTest(TestCase):
@@ -17,7 +20,7 @@ class ConversationBuilderTest(TestCase):
 
         # sanity
         conversation = build_conversation(nodes)
-        _, actual_nodes = zip(*iter_conversation(conversation))
+        _, actual_nodes = zip(*conversation.iter_conversation())
         actual_nodes_ids = list(map(itemgetter(0), actual_nodes))
 
         # check each node is visited only once, and all nodes are actually visited
@@ -44,13 +47,27 @@ class ConversationBuilderTest(TestCase):
 
         # sanity
         conversation = build_conversation_from_ordered(nodes)
-        _, actual_nodes = zip(*iter_conversation(conversation))
+        _, actual_nodes = zip(*conversation.iter_conversation())
         actual_nodes_ids = list(map(itemgetter(0), actual_nodes))
         self.assertListEqual(expected_dfs_order, actual_nodes_ids)
 
         #edge cases
         no_root_nodes = nodes[1:]
         self.assertRaisesRegex(ValueError, "None parent", build_conversation_from_ordered, no_root_nodes)
+
+    def test_interaction_graph(self):
+        nodes, _ = list(generate_ordered_nodes_data())
+        conversation = build_conversation_from_ordered(nodes)
+        parser = get_reply_interactions_parser()
+        ig = parser.parse(conversation)
+        type(ig)
+        isinstance(ig.graph, nx.Graph)
+
+        layout = nx.spring_layout(ig.graph)
+        nx.draw_networkx(ig.graph, layout)
+        pyplot.show()
+
+
 
 
 def generate_ordered_nodes_data() -> Tuple[Iterable[Tuple[NodeData, Any, Any]], List[int]]:
@@ -77,6 +94,9 @@ def generate_children_map() -> Dict[Any, List[Tuple[NodeData, Any, Any]]]:
         3: [(NodeData(6, "u2"), 6, 3)],
         5: [(NodeData(7, "u1"), 7, 5)]
     }
+
+
+
 
 
 
