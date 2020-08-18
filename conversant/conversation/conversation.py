@@ -87,6 +87,10 @@ class Conversation(object):
         self.__tree = conversation_tree
 
     @property
+    def id(self) -> Any:
+        return self.root.node_id
+
+    @property
     def root(self) -> ConversationNode:
         return self.__tree
 

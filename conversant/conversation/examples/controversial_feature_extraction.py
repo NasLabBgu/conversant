@@ -6,12 +6,14 @@ from conversation import Conversation, ConversationNode, NodeData
 
 import pandas as pd
 import numpy as np
+import networkx as nx
 
 
 
 ## Feature Extraction
 from conversation.conversation_utils import iter_conversation_with_branches, iter_conversation_branches
 from conversation.examples.reddit_conversation_reader import CMVConversationReader
+from interactions.reply_interactions_parser import get_reply_interactions_parser
 
 
 def get_average_out_degree(conv: Conversation, ignore_leaves: bool = False) -> float:
@@ -43,20 +45,78 @@ def get_timestamp_diff_stats(conv: Conversation) -> Tuple[float, ...]:
     median = float(np.median(diffs))
     return avg, median
 
+## interaction graph features
+
+def get_clustering_coeff(graph :nx.graph) -> float:
+    if len(graph) == 0:
+        return 0
+
+    return nx.average_clustering(graph)
+
+
+def get_average_degree(graph: nx.graph) -> float:
+    return float(np.mean([value for _, value in graph.degree()]))
+
+
+def get_average_betweeness_centrality(graph: nx.graph) -> float:
+    return float(np.mean([value for value in nx.betweenness_centrality(graph).values()]))
+
+
+def get_two_core_size(graph: nx.Graph) -> int:
+    return len(nx.k_core(graph,2))
+
+
+def get_three_core_size(graph: nx.Graph) -> int:
+    return len(nx.k_core(graph,3))
+
+
+def get_two_core_to_full_graph_ratio(graph: nx.Graph) -> float:
+    return len(nx.k_core(graph,2)) / len(graph)
+
+
+def three_core_to_full_graph_ratio(graph: nx.Graph) -> float:
+    return len(nx.k_core(graph,3)) / len(graph)
+
 
 def get_features(conv: Conversation) -> Dict[str, float]:
     num_nodes = conv.size
+    num_users = len(list(conv.participants))
     avg_out_degree = get_average_out_degree(conv)
     avg_out_degree_no_leaves = get_average_out_degree(conv, ignore_leaves=True)
     num_branches = len(list(iter_conversation_branches(conv)))
     average_users_per_branch = get_average_participants_per_branch(conv)
     avg_ts_diff, median_ts_diff = get_timestamp_diff_stats(conv)
 
-    feature_names = ["num_nodes", "avg_out_degree", "avg_out_degree_no_leaves",
-            "num_branches", "average_users_per_branch", "avg_ts_diff",
-            "median_ts_dif"]
-    features = [num_nodes, avg_out_degree, avg_out_degree_no_leaves, num_branches, average_users_per_branch, avg_ts_diff, median_ts_diff]
-    return dict(zip(feature_names, features))
+    conversation_values = [
+        conv.id, num_nodes, num_users, avg_out_degree, avg_out_degree_no_leaves,
+        num_branches, average_users_per_branch, avg_ts_diff, median_ts_diff
+    ]
+    conversation_names = [
+        "conv_id", "num_nodes", "num_users", "avg_out_degree", "avg_out_degree_no_leaves",
+        "num_branches", "average_users_per_branch", "avg_ts_diff", "median_ts_dif"
+    ]
+
+    # exctract interactions graph features
+    interactions_parser = get_reply_interactions_parser()
+    interactions_graph = interactions_parser.parse(conv)
+    g = interactions_graph.graph
+
+    graph_size = len(g)
+    cluster_coeff = get_clustering_coeff(g)
+    avg_interactions_degree = get_average_degree(g)
+    avg_betweeness = get_average_betweeness_centrality(g)
+    two_core_size = get_two_core_size(g)
+    three_core_size = get_three_core_size(g)
+    two_core_ratio = float(two_core_size) / graph_size if graph_size > 0 else 0
+    three_core_ratio = float(three_core_size) / graph_size if graph_size > 0 else 0
+
+    interactions_values = [cluster_coeff, avg_interactions_degree, avg_betweeness, two_core_size, three_core_size, two_core_ratio, three_core_ratio]
+    interactions_names = ["cluster_coeff", "avg_interactions_degree", "avg_betweeness", "two_core_size", "three_core_size", "two_core_ratio", "three_core_ratio"]
+
+    # finalize
+    values = conversation_values + interactions_values
+    names = conversation_names + interactions_names
+    return dict(zip(names, values))
 
 
 #### runner utils
