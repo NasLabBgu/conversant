@@ -1,7 +1,7 @@
 from typing import Any, Dict, Iterable
 
 from conversant.conversation import Conversation
-from conversant.conversation.conversation_utils import iter_conversation_branches
+from conversant.conversation.conversation_utils import iter_conversation_with_branches
 from conversant.interactions.aggregators import InteractionsAggregator
 from conversant.interactions import InteractionsGraph
 from conversant.interactions.interactions_graph import PairInteractionsData
@@ -18,7 +18,7 @@ class InteractionsParser(object):
     def parse(self, conversation: Conversation) -> InteractionsGraph:
         # collect interaction values
         interactions = {}
-        for node, branch in iter_conversation_branches(conversation):
+        for node, branch in iter_conversation_with_branches(conversation):
             for interaction_name, aggregator in self.__aggregators.items():
                 for u1, u2, interaction in aggregator.extract(node, branch, conversation):
                     users_key = self.__get_users_pair_key(u1, u2)

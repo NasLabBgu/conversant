@@ -4,7 +4,6 @@ from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, U
 from anytree import NodeMixin, RenderTree
 
 
-
 class NodeData(NamedTuple):
     """
     the data each node in the conversation holds.
@@ -90,6 +89,10 @@ class Conversation(object):
     @property
     def root(self) -> ConversationNode:
         return self.__tree
+
+    @property
+    def size(self) -> int:
+        return sum(1 for _ in self.iter_conversation())
 
     @property
     def participants(self) -> Iterable[Any]:

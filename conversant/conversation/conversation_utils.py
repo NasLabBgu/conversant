@@ -42,7 +42,7 @@ def iter_conversation_by_timestamp(root: ConversationNode, initial_depth: int = 
         yield depth, next_node
 
 
-def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[ConversationNode, List[ConversationNode]]]:
+def iter_conversation_with_branches(conversation: Conversation) -> Iterable[Tuple[ConversationNode, List[ConversationNode]]]:
     """
     walk the conversation tree and generate pairs of node and its corresponding branch leading to it.
     Args:
@@ -52,7 +52,7 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Con
         Iterable of pairs of NodeData coupled with a list of all nodes in the branch preceding this node.
     """
     root = conversation.root
-    current_branch_nodes: List[NodeData] = []     # Stores the previous nodes in the parsed branch
+    current_branch_nodes: List[ConversationNode] = []     # Stores the previous nodes in the parsed branch
     for depth, node in root.iter_conversation_tree():
         # check if the entire current branch was parsed, and start walking to the next branch
         if depth < len(current_branch_nodes):
@@ -62,9 +62,38 @@ def iter_conversation_branches(conversation: Conversation) -> Iterable[Tuple[Con
         yield node, current_branch_nodes[:]
 
 
-def conversation_to_dataframe(conversation: Conversation, data_fields: List[str] = None) -> pd.DataFrame:
+def iter_conversation_branches(conversation: Conversation, min_length: int = 0) -> Iterable[List[ConversationNode]]:
     """
 
+    Args:
+        conversation:
+        min_length:
+
+    Returns:
+
+    """
+    root = conversation.root
+    current_branch_nodes: List[ConversationNode] = []
+    new_nodes_count = 0
+    for depth, node in root.iter_conversation_tree():
+        # check if the entire current branch was parsed, and start walking to the next branch
+        if depth < len(current_branch_nodes):
+            if new_nodes_count >= min_length:
+                yield current_branch_nodes[:]
+
+            new_nodes_count = 0
+            del current_branch_nodes[depth:]
+
+        current_branch_nodes.append(node)
+        new_nodes_count += 1
+
+    if new_nodes_count >= min_length:
+        yield current_branch_nodes[:]
+
+
+def conversation_to_dataframe(conversation: Conversation, data_fields: List[str] = None) -> pd.DataFrame:
+    """
+    convert a conversation to a pandas DataFrame.
     Args:
         conversation: the conversation to converat into a DataFrame
         data_fields: a list fields from the node's data to include in the DataFrame.

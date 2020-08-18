@@ -4,8 +4,8 @@ from unittest import TestCase
 from anytree import LevelOrderGroupIter
 
 from conversant.conversation import NodeData, ConversationNode, Conversation
-from conversation.conversation_utils import iter_conversation_branches, iter_conversation_by_timestamp, \
-    conversation_to_dataframe
+from conversation.conversation_utils import iter_conversation_with_branches, iter_conversation_by_timestamp, \
+    conversation_to_dataframe, iter_conversation_branches
 
 
 class ConversationUtilsTest(TestCase):
@@ -39,7 +39,7 @@ class ConversationUtilsTest(TestCase):
         conversation, nodes_by_dfs_order = generate_conversation_with_ordered_nodes()
         expected_depths, expected_nodes = zip(*list(conversation.iter_conversation()))
 
-        iteration = list(iter_conversation_branches(conversation))
+        iteration = list(iter_conversation_with_branches(conversation))
         actual_nodes, branches = zip(*iteration)
         actual_depth = [len(branch) - 1 for branch in branches]
 
@@ -70,6 +70,14 @@ class ConversationUtilsTest(TestCase):
         conversation, _ = generate_conversation_with_ordered_nodes()
         df = conversation_to_dataframe(conversation)
         print(df)
+
+    def test_iter_conversation_branches(self):
+        conv, _ = generate_conversation_with_ordered_nodes()
+        branches = list(iter_conversation_branches(conv))
+        self.assertEqual(3, len(branches))
+        self.assertEqual(4, len(branches[0]))
+        self.assertEqual(4, len(branches[1]))
+        self.assertEqual(3, len(branches[2]))
 
 
 def generate_conversation_with_ordered_nodes() -> Tuple[Conversation, List[ConversationNode]]:
