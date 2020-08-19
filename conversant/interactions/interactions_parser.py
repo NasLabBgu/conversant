@@ -40,7 +40,7 @@ class InteractionsParser(object):
             user1, user2 = pair_data[AUTHORS_IDENTIFIERS_FIELD]
             interactions.append(PairInteractionsData(user1, user2, pair_interactions))
 
-        return InteractionsGraph(interactions, conversation.op, self.directed)
+        return InteractionsGraph(conversation.op, interactions, self.directed)
 
     def __get_users_pair_key(self, u1: Any, u2: Any) -> tuple:
         if not self.directed:
