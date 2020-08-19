@@ -1,11 +1,12 @@
 from typing import List, Iterable, Tuple, Any
 
-from conversant.conversation import Conversation, NodeData
+from conversant.conversation import Conversation
 from conversant.interactions import InteractionsParser
 from conversant.interactions.aggregators import CountInteractionsAggregator
+from conversation import ConversationNode
 
 
-def get_reply_interaction_users(node: NodeData, branch: List[NodeData], conversation: Conversation) -> Iterable[Tuple[Any, Any]]:
+def get_reply_interaction_users(node: ConversationNode, branch: List[ConversationNode], conversation: Conversation) -> Iterable[Tuple[Any, Any]]:
     """
     parse th reply interaction of the current node.
     This is to determine the parent's author

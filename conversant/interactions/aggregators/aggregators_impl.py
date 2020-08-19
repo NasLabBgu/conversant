@@ -1,9 +1,10 @@
 from typing import List, Iterable, Tuple, Any, Callable
 
-from conversant.conversation import NodeData, Conversation
+from conversant.conversation import Conversation
 from conversant.interactions.aggregators import InteractionsAggregator
+from conversation import ConversationNode
 
-ExtractFunc = Callable[[NodeData, List[NodeData], Conversation], Iterable[Tuple[Any, Any]]]
+ExtractFunc = Callable[[ConversationNode, List[ConversationNode], Conversation], Iterable[Tuple[Any, Any]]]
 
 
 class CountInteractionsAggregator(InteractionsAggregator[None, int, list]):
@@ -15,7 +16,7 @@ class CountInteractionsAggregator(InteractionsAggregator[None, int, list]):
     def initialize_interactions_container(self) -> list:
         return [0]
 
-    def extract(self, node: NodeData, branch: List[NodeData], tree: Conversation) -> Iterable[Tuple[Any, Any, None]]:
+    def extract(self, node: ConversationNode, branch: List[ConversationNode], tree: Conversation) -> Iterable[Tuple[Any, Any, None]]:
         for u1, u2 in self.__extract_func(node, branch, tree):
             yield u1, u2, None
 

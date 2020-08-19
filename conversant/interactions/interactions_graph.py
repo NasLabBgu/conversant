@@ -63,13 +63,18 @@ Condition = Callable[[PairInteractionsData], bool]
 
 
 class InteractionsGraph(object):
-    def __init__(self, interactions: Iterable[PairInteractionsData], directed: bool = False):
+    def __init__(self, op: Any, interactions: Iterable[PairInteractionsData], directed: bool = False):
         self.directed = directed
         self.__graph = from_pair_interactions_data(interactions, directed)
+        self.__op = op
 
     @property
     def graph(self) -> nx.Graph:
         return self.__graph
+
+    @property
+    def op(self) -> Any:
+        return self.__op
 
     @property
     def interactions(self) -> Iterable[PairInteractionsData]:
@@ -95,7 +100,7 @@ class InteractionsGraph(object):
         interactions_dict = {e[:2]: e[2] for e in filtered_pairs_data}
 
         if not inplace:
-            return InteractionsGraph(interactions_dict, self.directed)
+            return InteractionsGraph(self.op, interactions_dict, self.directed)
 
         # filter inplace
         filtered_edges = map(itemgetter(0, 1), filtered_pairs_data)
@@ -135,6 +140,9 @@ class InteractionsGraph(object):
             return pair.user1 in component_nodes
 
         return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+
+    def get_op_connected_components(self, scc: bool = False, inplace: bool = False) -> 'InteractionsGraph':
+        return self.get_author_connected_component(author=self.op, scc=scc, inplace=inplace)
 
     def get_core_interactions(self, inplace: bool = False) -> 'InteractionsGraph':
         """

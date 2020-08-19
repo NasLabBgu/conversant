@@ -91,6 +91,10 @@ class Conversation(object):
         return self.root.node_id
 
     @property
+    def op(self) -> Any:
+        return self.root.author
+
+    @property
     def root(self) -> ConversationNode:
         return self.__tree
 
@@ -121,7 +125,6 @@ class Conversation(object):
             Generates pairs of tree nodes with their respective depth.
         """
         return self.root.iter_conversation_tree(init_depth, max_depth)
-
 
     def prune(self, condition: Callable[[NodeData], bool]) -> 'Conversation':
         """
