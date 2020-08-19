@@ -2,7 +2,7 @@ from typing import List, Iterable, Tuple, Any, Callable
 
 from conversant.conversation import Conversation
 from conversant.interactions.aggregators import InteractionsAggregator
-from conversation import ConversationNode
+from conversant.conversation import ConversationNode
 
 ExtractFunc = Callable[[ConversationNode, List[ConversationNode], Conversation], Iterable[Tuple[Any, Any]]]
 

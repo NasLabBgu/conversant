@@ -3,7 +3,7 @@ from typing import TypeVar, List, Tuple, Any, Iterable, Generic
 
 
 from conversant.conversation import Conversation, NodeData
-from conversation import ConversationNode
+from conversant.conversation import ConversationNode
 
 T = TypeVar('T')  # interaction value type
 K = TypeVar('K')  # aggregated interactions value type
