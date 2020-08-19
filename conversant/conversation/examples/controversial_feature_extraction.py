@@ -10,8 +10,8 @@ import networkx as nx
 
 
 ## Feature Extraction
-from conversation.conversation_utils import iter_conversation_branches
-from conversation.examples.reddit_conversation_reader import CMVConversationReader
+from conversant.conversation.conversation_utils import iter_conversation_branches
+from conversant.conversation.examples.reddit_conversation_reader import CMVConversationReader
 from conversant.interactions.reply_interactions_parser import get_reply_interactions_parser
 
 
