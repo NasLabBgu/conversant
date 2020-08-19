@@ -12,7 +12,7 @@ import networkx as nx
 ## Feature Extraction
 from conversation.conversation_utils import iter_conversation_branches
 from conversation.examples.reddit_conversation_reader import CMVConversationReader
-from interactions.reply_interactions_parser import get_reply_interactions_parser
+from conversant.interactions.reply_interactions_parser import get_reply_interactions_parser
 
 
 def get_average_out_degree(conv: Conversation, ignore_leaves: bool = False) -> float:
