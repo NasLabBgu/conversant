@@ -3,7 +3,7 @@ from typing import List, Iterable, Tuple, Any
 from conversant.conversation import Conversation
 from conversant.interactions import InteractionsParser
 from conversant.interactions.aggregators import CountInteractionsAggregator
-from conversation import ConversationNode
+from conversant.conversation import ConversationNode
 
 
 def get_reply_interaction_users(node: ConversationNode, branch: List[ConversationNode], conversation: Conversation) -> Iterable[Tuple[Any, Any]]:
