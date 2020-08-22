@@ -69,7 +69,7 @@ class ConversationUtilsTest(TestCase):
     def test_conversation_to_dataframe(self):
         conversation, _ = generate_conversation_with_ordered_nodes()
         df = conversation_to_dataframe(conversation)
-        print(df)
+        print(df.columns)
 
     def test_iter_conversation_branches(self):
         conv, _ = generate_conversation_with_ordered_nodes()

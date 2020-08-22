@@ -107,7 +107,7 @@ def conversation_to_dataframe(conversation: Conversation, data_fields: List[str]
     # path is also available if needed
     records = (
         {
-            **get_base_data(node),
+            **get_base_data(node, conversation),
             **extract_node_data(node.data, data_fields)
          }
         for _, node in conversation.iter_conversation()
@@ -115,12 +115,21 @@ def conversation_to_dataframe(conversation: Conversation, data_fields: List[str]
     return pd.DataFrame.from_records(records, index="node_id")
 
 
-def get_base_data(n: ConversationNode) -> Dict[str, Union[str, int, bool]]:
-    NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_leaf", "timestamp"]
+def get_base_data(n: ConversationNode, conv: Conversation) -> Dict[str, Union[str, int, bool]]:
+    NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_absolute_root", "is_leaf", "timestamp", "conversation_id", "full_conv_id"]
     parent_id = None if n.parent is None else n.parent.node_id
-    base_values = [n.node_id, n.author, parent_id, n.depth, n.is_root, n.is_leaf, n.timestamp]
+    is_relative_root = conv.root.node_id == n.node_id
+    full_conv_id =  get_full_conv_id(conv.root)
+    base_values = [n.node_id, n.author, parent_id, n.depth, is_relative_root, n.is_root, n.is_leaf, n.timestamp, conv.id, full_conv_id]
     return dict(zip(NODE_RECORD_BASE_FIELDS, base_values))
 
+
+def get_full_conv_id(sub_conv: ConversationNode) -> Any:
+    current_node = sub_conv
+    while(current_node.parent_id is not None):
+        current_node = current_node.parent
+
+    return current_node.node_id
 
 def extract_node_data(data: dict, fields: List[str] = None) -> Dict[str, Any]:
     flat_data = flatten_dict(data) if fields is None \
