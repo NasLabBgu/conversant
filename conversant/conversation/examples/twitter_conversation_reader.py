@@ -55,7 +55,8 @@ if __name__ == "__main__":
     sample = pd.read_json(
         r"C:\Users\ronp\PycharmProjects\twitter-scraper\convoscrape\response_exploration\conv-1203211859366576128\tweets.jsonl",
         lines=True,
-        dtype={'in_reply_to_status_id_str': str, "id_str": str})
+        dtype={"in_reply_to_status_id_str": str, "id_str": str}
+    )
 
     cols = ['created_at', 'id_str', 'text', 'user_id_str', 'conversation_id_str', 'in_reply_to_status_id_str',
             'in_reply_to_screen_name']
