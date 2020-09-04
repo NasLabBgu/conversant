@@ -26,8 +26,8 @@ def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]], root_par
         children = children_map.setdefault(parent_id, [])
         children.append(node)
 
-    ordered_nodes = sort_nodes_from_children_map(children_map)
-    return build_conversation_from_ordered(ordered_nodes)
+    ordered_nodes = sort_nodes_from_children_map(children_map, root_parent_value)
+    return build_conversation_from_ordered(ordered_nodes, root_parent_value)
 
 
 def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, Any, Any]]],
@@ -58,7 +58,8 @@ def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, An
         yield next_node
 
 
-def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, Any]]) -> Conversation:
+def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, Any]],
+                                    root_parent_value: Any = ROOT_PARENT) -> Conversation:
     """
     same functionality as 'build_conversation', but 'nodes_data' is assumed to be ordered such that
     a parent must occur as a node by itself before occurring as a parent.
@@ -72,8 +73,9 @@ def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, An
     nodes_data = iter(nodes_data)
     root_data, root_id, parent_id = next(nodes_data)
     # validate that the first element is the root.
-    if parent_id is not None:
-        raise ValueError(f"The first element in 'nodes_data' must be the root with a None parent,"
+    if parent_id is not root_parent_value:
+        raise ValueError(f"The first element in 'nodes_data' must be the root with a {ROOT_PARENT} parent,"
+                         f"or equalt to a given 'root_parent_value',"
                          f"but given parent id was: {parent_id}")
 
     root_node = ConversationNode(node_data=root_data)

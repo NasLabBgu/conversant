@@ -58,7 +58,7 @@ class ConversationParser(Generic[K, T], abc.ABC):
 
     def parse(self, raw_conversation: K, root_id: Any = None) -> Conversation:
         """
-        takes a raw conversation and build a `Conversation` instance from it.
+        tarukes a raw conversation and build a `Conversation` instance from it.
         Args:
             raw_conversation: conversation tree to parse.
             root_id: force the node with this id to be the root of the conversation.
@@ -68,7 +68,8 @@ class ConversationParser(Generic[K, T], abc.ABC):
             a `Conversation` that represent the data in the given 'raw_conversation'.
         """
         conversation_components = self.__parse_to_triplets(raw_conversation, root_id)
-        return build_conversation(conversation_components)
+        root_parent_value = None if root_id is None else SPECIFIED_ROOT_PARENT_VALUE
+        return build_conversation(conversation_components, root_parent_value)
 
     def __parse_to_triplets(self, raw_conversation: K, root_id: Any = None) -> Iterable[Tuple[NodeData, Any, Any]]:
         """
@@ -99,7 +100,7 @@ class ConversationParser(Generic[K, T], abc.ABC):
 
             yield node_data, node_id, parent_id
 
-        if not root_found:
-            raise ValueError(
-                "No root found (i.e node with None as a parent_id)"
-            )
+        # if not root_found:
+        #     raise ValueError(
+        #         "No root found (i.e node with None as a parent_id)"
+        #     )

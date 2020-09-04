@@ -53,7 +53,7 @@ class ConversationNode(NodeMixin):
     def data(self) -> dict:
         return self.node_data.data
 
-    def get_children(self) -> Tuple['ConversationNode']:
+    def get_children(self) -> Tuple['ConversationNode', ...]:
         return self.children
 
     def iter_conversation_tree(self, init_depth: int = 0, max_depth: int = None) -> Iterable[Tuple[int, 'ConversationNode']]:
