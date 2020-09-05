@@ -50,6 +50,7 @@ def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, An
         root_parent_value = infer_root_parent(children_map)
     # perform topological sorting by performing bfs on 'children_map' starting from the root node.
     root_node = children_map[root_parent_value]  # get a children list with a single element which is the root.
+    root_node = (root_node[0], root_node[1], None)
     nodes = deque(root_node)
     while len(nodes) > 0:
         next_node = nodes.pop()

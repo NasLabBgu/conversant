@@ -73,7 +73,6 @@ class ConversationNode(NodeMixin):
                 for subtree in self.children:
                     yield from subtree.iter_conversation_tree(init_depth=init_depth + 1, max_depth=max_depth)
 
-
     def __lt__(self, other: 'ConversationNode'):
         return self.timestamp < other.timestamp
 
