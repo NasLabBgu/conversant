@@ -73,10 +73,10 @@ def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, An
     nodes_data = iter(nodes_data)
     root_data, root_id, parent_id = next(nodes_data)
     # validate that the first element is the root.
-    if parent_id is not root_parent_value:
-        raise ValueError(f"The first element in 'nodes_data' must be the root with a {ROOT_PARENT} parent,"
-                         f"or equalt to a given 'root_parent_value',"
-                         f"but given parent id was: {parent_id}")
+    # if parent_id is not root_parent_value:
+    #     raise ValueError(f"The first element in 'nodes_data' must be the root with a {ROOT_PARENT} parent,"
+    #                      f"or equalt to a given 'root_parent_value',"
+    #                      f"but given parent id was: {parent_id}")
 
     root_node = ConversationNode(node_data=root_data)
     nodes_map = {root_id: root_node}
