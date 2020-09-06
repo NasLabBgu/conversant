@@ -77,7 +77,7 @@ def get_extract_data_func_from_dict(fields_mapping: Dict[str, str]) -> Callable[
 
     def extract_data(row: pd.Series) -> NodeData:
         if other_data_fields is not None:
-            data = {f: row[f] for f in other_data_fields}
+            data = {f: row.get(f) for f in other_data_fields}
         else:
             data = dict(row)
 
