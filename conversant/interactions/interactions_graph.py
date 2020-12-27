@@ -100,7 +100,7 @@ class InteractionsGraph(object):
         interactions_dict = {e[:2]: e[2] for e in filtered_pairs_data}
 
         if not inplace:
-            return InteractionsGraph(self.op, interactions_dict, self.directed)
+            return InteractionsGraph(self.op, interactions_dict.values(), self.directed)
 
         # filter inplace
         filtered_edges = map(itemgetter(0, 1), filtered_pairs_data)
