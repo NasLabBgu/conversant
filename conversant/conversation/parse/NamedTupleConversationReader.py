@@ -2,12 +2,17 @@ from typing import Iterable, Callable, Union, Dict, List, Any, NamedTuple
 
 from conversant.conversation import NodeData
 from conversant.conversation.parse import ConversationParser
+from conversant.conversation.parse.conversation_parser import K
 
 
 class NamedTupleConversationReader(ConversationParser[Iterable[NamedTuple], NamedTuple]):
     """
     a class for parsing conversations from a iterable of NamedTuples.
     """
+
+    def extract_conversation_id(self, raw_conversation: Iterable[NamedTuple]) -> Any:
+        pass
+
     def __init__(self,
                  data_extraction_strategy: Union[Dict[str, Union[str, List[str]]], Callable[[NamedTuple], NodeData]],
                  no_parent_value: Any = None
@@ -15,7 +20,7 @@ class NamedTupleConversationReader(ConversationParser[Iterable[NamedTuple], Name
         """
         Args:
             data_extraction_strategy: (dict or callable)
-                If dict is given, then it must contain at least 4 keys: 'node_id', 'author', 'timestamp', 'parent_id',
+                If dict is given, then it must contain at least 5 keys: 'node_id', 'author', 'timestamp', 'parent_id',
                 where each of these is mapped to the corresponding field name in the DataFrames to be parsed. additional
                 key might be 'data' and should be mapped to a sequence of field names to take as data for each node
                 in the conversation. if 'data' is not given, all additional fields are taken as data for each node.

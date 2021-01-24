@@ -5,12 +5,13 @@ from typing import Any, Dict, Callable, Set, Iterable
 import networkx as nx
 
 
-WEIGHT_FIELD = "weight"
+WEIGHT_FIELD_NAME = "weight"
 
 
 class PairInteractionsData(UserDict):
     # TODO figure out immutability to this class - but only after the networkx graph has beeen initialied
     MAX_UPDATES = 2
+    WEIGHT_FIELD = WEIGHT_FIELD_NAME
 
     def __init__(self, user1: Any, user2: Any, interactions: Dict[str, Any]):
         super(PairInteractionsData, self).__init__()
@@ -35,10 +36,10 @@ class PairInteractionsData(UserDict):
         return PairInteractionsData(None, None, {})
 
     def set_weight(self, weight: float):
-        self.data[WEIGHT_FIELD] = weight
+        self.data[self.WEIGHT_FIELD] = weight
 
     def calculate_weight(self, weight: Callable[['PairInteractionsData'], float]):
-        self.data[WEIGHT_FIELD] = weight(self)
+        self.data[self.WEIGHT_FIELD] = weight(self)
 
     def __repr__(self):
         return f"PairInteractionsData(user1={self.user1}, user2={self.user2}, interactions={self.interactions})"
@@ -63,6 +64,9 @@ Condition = Callable[[PairInteractionsData], bool]
 
 
 class InteractionsGraph(object):
+
+    WEIGHT_FIELD = WEIGHT_FIELD_NAME
+
     def __init__(self, op: Any, interactions: Iterable[PairInteractionsData], directed: bool = False):
         self.directed = directed
         self.__graph = from_pair_interactions_data(interactions, directed)

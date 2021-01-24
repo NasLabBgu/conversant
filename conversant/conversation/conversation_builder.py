@@ -8,14 +8,19 @@ EMPTY_SEQUENCE = tuple()
 ROOT_PARENT = None
 
 
-def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]], root_parent_value: Any = ROOT_PARENT) -> Conversation:
+def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]], conversation_id: Any = None, root_parent_value: Any = ROOT_PARENT) -> Conversation:
     """
     Takes an iterable of nodes paired with their parent id, and builds a conversation object from the nodes.
     the parent of the root should be None, and only a single root is supported.
     if multiple nodes will have a None parent, then result is undefined.
     Args:
-        nodes_data: an iterable of tuples containing the node's data, node's id and its parent id,
-        (i.e  a triplet of (node_data, 'node_id', 'parent_id') ).
+        nodes_data:
+            an iterable of tuples containing the node's data, node's id and its parent id,
+            (i.e  a triplet of (node_data, 'node_id', 'parent_id') ).
+        conversation_id:
+            A unique identifier for the resulting conversation.
+        root_parent_value:
+            the id value of the root parent.
 
     Returns:
         a Conversation object
@@ -27,7 +32,7 @@ def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]], root_par
         children.append(node)
 
     ordered_nodes = sort_nodes_from_children_map(children_map, root_parent_value)
-    return build_conversation_from_ordered(ordered_nodes, root_parent_value)
+    return build_conversation_from_ordered(ordered_nodes, conversation_id, root_parent_value)
 
 
 def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, Any, Any]]],
@@ -59,17 +64,26 @@ def sort_nodes_from_children_map(children_map: Dict[Any, List[Tuple[NodeData, An
         yield next_node
 
 
-def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, Any]],
-                                    root_parent_value: Any = ROOT_PARENT) -> Conversation:
+def build_conversation_from_ordered(
+        nodes_data: Iterable[Tuple[NodeData, Any, Any]],
+        conversation_id: Any = None,
+        root_parent_value: Any = ROOT_PARENT
+) -> Conversation:
     """
     same functionality as 'build_conversation', but 'nodes_data' is assumed to be ordered such that
     a parent must occur as a node by itself before occurring as a parent.
     Args:
-        nodes_data: an iterable of tuples containing the node's data, node's id and its parent id,
-        (i.e  a triplet of (node_data, 'node_id', 'parent_id') ).
+        nodes_data:
+            an iterable of tuples containing the node's data, node's id and its parent id,
+            (i.e  a triplet of (node_data, 'node_id', 'parent_id') ).
+        conversation_id:
+            A unique identifier of the returned conversation.
+        root_parent_value:
+            the id value of the parent of the root node. the default value is 'None'.
 
     Returns:
-        a Conversation object
+        a Conversation object.
+
     """
     nodes_data = iter(nodes_data)
     root_data, root_id, parent_id = next(nodes_data)
@@ -82,11 +96,11 @@ def build_conversation_from_ordered(nodes_data: Iterable[Tuple[NodeData, Any, An
     root_node = ConversationNode(node_data=root_data)
     nodes_map = {root_id: root_node}
     for data, node_id, parent_id in nodes_data:
-        parent_node = nodes_map[parent_id] if parent_id is not None else None
+        parent_node = nodes_map[parent_id] if parent_id != root_parent_value else None
         children_node = ConversationNode(parent=parent_node, node_data=data)
         nodes_map[node_id] = children_node
 
-    return Conversation(root_node)
+    return Conversation(root_node, conversation_id)
 
 
 def infer_root_parent(children_map: Dict[Any, List[Tuple[NodeData, Any, Any]]]) -> Any:
