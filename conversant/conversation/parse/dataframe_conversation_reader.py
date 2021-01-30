@@ -4,12 +4,14 @@ import pandas as pd
 
 from conversant.conversation import NodeData
 from conversant.conversation.parse import ConversationParser
+from conversant.conversation.parse.conversation_parser import K
 
 
 class DataFrameConversationReader(ConversationParser[pd.DataFrame, pd.Series]):
     """
     a class for parsing conversations from a DataFrame.
     """
+
     def __init__(self,
                  data_extraction_strategy: Union[Dict[str, Union[str, List[str]]], Callable[[pd.Series], NodeData]],
                  no_parent_value: Any = None
@@ -30,6 +32,9 @@ class DataFrameConversationReader(ConversationParser[pd.DataFrame, pd.Series]):
         super().__init__()
         self.extract_data = get_extract_data_func(data_extraction_strategy)
         self.no_parent_value = no_parent_value
+
+    def extract_conversation_id(self, raw_conversation: K) -> Any:
+        raise NotImplementedError
 
     def extract_node_data(self, raw_node: pd.Series) -> NodeData:
         node_data = self.extract_data(raw_node)

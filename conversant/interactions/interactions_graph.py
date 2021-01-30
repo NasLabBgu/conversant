@@ -111,6 +111,17 @@ class InteractionsGraph(object):
         self.__graph = self.__graph.edge_subgraph(filtered_edges)
         return self
 
+    def get_subgraph(self, nodes: Set[Any], inplace: bool = False) -> 'InteractionsGraph':
+        if inplace:
+            self.__graph = self.__graph.subgraph(nodes)
+            return self
+
+        def is_pair_to_keep(pair: PairInteractionsData) -> bool:
+            # if user1 is contained, then user2 is contained. otherwise the given interaction wouldn't exist.
+            return pair.user1 in nodes
+
+        return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+
     def get_author_connected_component(self, author: Any, scc: bool = False,
                                        inplace: bool = False) -> 'InteractionsGraph':
         """
@@ -135,15 +146,7 @@ class InteractionsGraph(object):
         else:
             component_nodes = nx.node_connected_component(self.graph, author)
 
-        if inplace:
-            self.__graph = self.__graph.subgraph(component_nodes)
-            return self
-
-        def is_pair_to_keep(pair: PairInteractionsData) -> bool:
-            # if user1 is contained, then user2 is contained. otherwise the given interaction wouldn't exist.
-            return pair.user1 in component_nodes
-
-        return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+        return self.get_subgraph(component_nodes, inplace=inplace)
 
     def get_op_connected_components(self, scc: bool = False, inplace: bool = False) -> 'InteractionsGraph':
         return self.get_author_connected_component(author=self.op, scc=scc, inplace=inplace)
