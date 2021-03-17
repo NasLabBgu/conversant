@@ -83,12 +83,22 @@ class Conversation(object):
     A conversation object that handles a conversation tree
     """
 
-    def __init__(self, conversation_tree: ConversationNode):
+    def __init__(self, conversation_tree: ConversationNode, conversation_id: Any = None):
+        """
+        Args:
+            conversation_tree:
+                The root node of this conversation from which the conversation tree begins.
+            conversation_id:
+                A unique identifier for this conversation.
+                If 'None' then this conversation id is set to be as the root node id.
+                default value is 'None'.
+        """
         self.__tree = conversation_tree
+        self.__conversation_id = conversation_id or conversation_tree.node_id
 
     @property
     def id(self) -> Any:
-        return self.root.node_id
+        return self.__conversation_id
 
     @property
     def op(self) -> Any:

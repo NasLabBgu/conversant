@@ -19,6 +19,18 @@ class ConversationParser(Generic[K, T], abc.ABC):
     as it is used as a special id symbol. Otherwise the behavior is undefined
     """
     @abc.abstractmethod
+    def extract_conversation_id(self, raw_conversation: K) -> Any:
+        """
+        Extracts data related to this node from the given 'raw' element. the
+        Args:
+            raw_conversation: the conversation for which the id is returned
+
+        Returns:
+            A unique identifier for this conversation.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def extract_node_data(self, raw_node: T) -> NodeData:
         """
         Extracts data related to this node from the given 'raw' element. the
@@ -68,8 +80,13 @@ class ConversationParser(Generic[K, T], abc.ABC):
             a `Conversation` that represent the data in the given 'raw_conversation'.
         """
         conversation_components = self.__parse_to_triplets(raw_conversation, root_id)
+        try:
+            conversation_id = self.extract_conversation_id(raw_conversation)
+        except NotImplementedError:
+            conversation_id = None
+
         root_parent_value = None if root_id is None else SPECIFIED_ROOT_PARENT_VALUE
-        return build_conversation(conversation_components, root_parent_value)
+        return build_conversation(conversation_components, conversation_id, root_parent_value)
 
     def __parse_to_triplets(self, raw_conversation: K, root_id: Any = None) -> Iterable[Tuple[NodeData, Any, Any]]:
         """

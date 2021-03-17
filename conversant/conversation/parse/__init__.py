@@ -1,3 +1,4 @@
 from conversant.conversation.parse.conversation_parser import ConversationParser
 from conversant.conversation.parse.anytree_conversation_parser import AnyTreeConversationParser
 from conversant.conversation.parse.dataframe_conversation_reader import DataFrameConversationReader
+from conversant.conversation.parse.NamedTupleConversationReader import NamedTupleConversationReader

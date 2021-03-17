@@ -1,10 +1,11 @@
-from typing import Iterable
+from typing import Iterable, Any
 
 from anytree import AnyNode
 from anytree.importer import JsonImporter
 
 from conversant.conversation import NodeData
 from conversant.conversation.parse import ConversationParser, AnyTreeConversationParser
+from conversant.conversation.parse.conversation_parser import K
 
 JSON = str
 
@@ -40,6 +41,10 @@ class CMVConversationReader(ConversationParser[str, JSON]):
         super(CMVConversationReader, self).__init__()
         self.__anytree_parser = AnyTreeConversationParser(extract_data)
         self.__importer = JsonImporter()
+
+    def extract_conversation_id(self, raw_conversation: JSON) -> Any:
+        tree = self.__importer.import_(raw_conversation)
+        return tree.node["id"]
 
     def extract_node_data(self, raw_node: AnyNode) -> NodeData:
         return self.__anytree_parser.extract_data(raw_node)

@@ -5,12 +5,13 @@ from typing import Any, Dict, Callable, Set, Iterable
 import networkx as nx
 
 
-WEIGHT_FIELD = "weight"
+WEIGHT_FIELD_NAME = "weight"
 
 
 class PairInteractionsData(UserDict):
     # TODO figure out immutability to this class - but only after the networkx graph has beeen initialied
     MAX_UPDATES = 2
+    WEIGHT_FIELD = WEIGHT_FIELD_NAME
 
     def __init__(self, user1: Any, user2: Any, interactions: Dict[str, Any]):
         super(PairInteractionsData, self).__init__()
@@ -35,10 +36,10 @@ class PairInteractionsData(UserDict):
         return PairInteractionsData(None, None, {})
 
     def set_weight(self, weight: float):
-        self.data[WEIGHT_FIELD] = weight
+        self.data[self.WEIGHT_FIELD] = weight
 
     def calculate_weight(self, weight: Callable[['PairInteractionsData'], float]):
-        self.data[WEIGHT_FIELD] = weight(self)
+        self.data[self.WEIGHT_FIELD] = weight(self)
 
     def __repr__(self):
         return f"PairInteractionsData(user1={self.user1}, user2={self.user2}, interactions={self.interactions})"
@@ -63,6 +64,9 @@ Condition = Callable[[PairInteractionsData], bool]
 
 
 class InteractionsGraph(object):
+
+    WEIGHT_FIELD = WEIGHT_FIELD_NAME
+
     def __init__(self, op: Any, interactions: Iterable[PairInteractionsData], directed: bool = False):
         self.directed = directed
         self.__graph = from_pair_interactions_data(interactions, directed)
@@ -100,12 +104,23 @@ class InteractionsGraph(object):
         interactions_dict = {e[:2]: e[2] for e in filtered_pairs_data}
 
         if not inplace:
-            return InteractionsGraph(self.op, interactions_dict, self.directed)
+            return InteractionsGraph(self.op, interactions_dict.values(), self.directed)
 
         # filter inplace
         filtered_edges = map(itemgetter(0, 1), filtered_pairs_data)
         self.__graph = self.__graph.edge_subgraph(filtered_edges)
         return self
+
+    def get_subgraph(self, nodes: Set[Any], inplace: bool = False) -> 'InteractionsGraph':
+        if inplace:
+            self.__graph = self.__graph.subgraph(nodes)
+            return self
+
+        def is_pair_to_keep(pair: PairInteractionsData) -> bool:
+            # if user1 is contained, then user2 is contained. otherwise the given interaction wouldn't exist.
+            return pair.user1 in nodes
+
+        return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
 
     def get_author_connected_component(self, author: Any, scc: bool = False,
                                        inplace: bool = False) -> 'InteractionsGraph':
@@ -131,15 +146,7 @@ class InteractionsGraph(object):
         else:
             component_nodes = nx.node_connected_component(self.graph, author)
 
-        if inplace:
-            self.__graph = self.__graph.subgraph(component_nodes)
-            return self
-
-        def is_pair_to_keep(pair: PairInteractionsData) -> bool:
-            # if user1 is contained, then user2 is contained. otherwise the given interaction wouldn't exist.
-            return pair.user1 in component_nodes
-
-        return self.filter_interactions(condition=is_pair_to_keep, inplace=inplace)  # inplace is always False here.
+        return self.get_subgraph(component_nodes, inplace=inplace)
 
     def get_op_connected_components(self, scc: bool = False, inplace: bool = False) -> 'InteractionsGraph':
         return self.get_author_connected_component(author=self.op, scc=scc, inplace=inplace)
