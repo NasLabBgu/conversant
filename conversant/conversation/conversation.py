@@ -1,4 +1,5 @@
 import weakref
+from operator import itemgetter
 from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union
 
 from anytree import NodeMixin, RenderTree
@@ -110,6 +111,13 @@ class Conversation(object):
         """
         unique_authors = set(node_data.author for _, node_data in self.iter_conversation())
         return unique_authors
+
+    @property
+    def maxdepth(self) -> int:
+        """
+        Returns: the value of the maximal depth for a node in this conversation
+        """
+        return max(map(itemgetter(0), self.iter_conversation()))
 
     def iter_conversation(self, init_depth: int = 0, max_depth: int = None
                           ) -> Iterable[Tuple[int, ConversationNode]]:
