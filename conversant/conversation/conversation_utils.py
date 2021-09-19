@@ -112,7 +112,8 @@ def conversation_to_dataframe(conversation: Conversation, data_fields: List[str]
          }
         for _, node in conversation.iter_conversation()
     )
-    return pd.DataFrame.from_records(records, index="node_id")
+    # return pd.DataFrame.from_records(records, index="node_id")
+    return pd.DataFrame.from_records(records)
 
 
 def get_base_data(n: ConversationNode, conv: Conversation) -> Dict[str, Union[str, int, bool]]:
