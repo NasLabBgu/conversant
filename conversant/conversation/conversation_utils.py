@@ -132,6 +132,7 @@ def get_full_conv_id(sub_conv: ConversationNode) -> Any:
 
     return current_node.node_id
 
+
 def extract_node_data(data: dict, fields: List[str] = None) -> Dict[str, Any]:
     flat_data = flatten_dict(data) if fields is None \
         else extract_data_from_fields(data, fields)
