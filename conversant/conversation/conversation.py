@@ -1,6 +1,6 @@
 import weakref
 from operator import itemgetter
-from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union
+from typing import NamedTuple, Callable, Sequence, Iterable, Tuple, List, Any, Union, Set
 
 from anytree import NodeMixin, RenderTree
 
@@ -113,14 +113,27 @@ class Conversation(object):
         return sum(1 for _ in self.iter_conversation())
 
     @property
+    def number_of_participants(self) -> int:
+        return len(self.participants_set)
+
+    @property
+    def participants_set(self) -> Set[Any]:
+        """
+        a set of all the authors who participate in this conversation.
+        Returns:
+            an
+        """
+        unique_authors = set(node_data.author for _, node_data in self.iter_conversation())
+        return unique_authors
+
+    @property
     def participants(self) -> Iterable[Any]:
         """
         a collection of all the authors who participate in this conversation.
         Returns:
             an
         """
-        unique_authors = set(node_data.author for _, node_data in self.iter_conversation())
-        return unique_authors
+        return self.participants_set
 
     @property
     def maxdepth(self) -> int:

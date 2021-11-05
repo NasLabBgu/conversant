@@ -4,7 +4,6 @@ import pandas as pd
 
 from conversant.conversation import NodeData
 from conversant.conversation.parse import ConversationParser
-from conversant.conversation.parse.conversation_parser import K
 
 
 class DataFrameConversationReader(ConversationParser[pd.DataFrame, pd.Series]):
@@ -14,12 +13,13 @@ class DataFrameConversationReader(ConversationParser[pd.DataFrame, pd.Series]):
 
     def __init__(self,
                  data_extraction_strategy: Union[Dict[str, Union[str, List[str]]], Callable[[pd.Series], NodeData]],
-                 no_parent_value: Any = None
+                 no_parent_value: Any = None,
+                 conversation_id_column: str = None
                  ):
         """
         Args:
             data_extraction_strategy: (dict or callable)
-                If dict is given, then it must contain at least 4 keys: 'node_id', 'author', 'timestamp', 'parent_id',
+                If dict is given, then it must contain at least 5 keys: 'node_id', 'author', 'timestamp', 'parent_id',
                 where each of these is mapped to the corresponding field name in the DataFrames to be parsed. additional
                 key might be 'data' and should be mapped to a sequence of field names to take as data for each node
                 in the conversation. if 'data' is not given, all additional fields are taken as data for each node.
@@ -32,9 +32,13 @@ class DataFrameConversationReader(ConversationParser[pd.DataFrame, pd.Series]):
         super().__init__()
         self.extract_data = get_extract_data_func(data_extraction_strategy)
         self.no_parent_value = no_parent_value
+        self.conversation_id_column = conversation_id_column
 
-    def extract_conversation_id(self, raw_conversation: K) -> Any:
-        raise NotImplementedError
+    def extract_conversation_id(self, raw_conversation: pd.DataFrame) -> Any:
+        if self.conversation_id_column is not None:
+            return raw_conversation[self.conversation_id_column][0]
+
+        return self.DEFAULT_CONVERSATION_ID
 
     def extract_node_data(self, raw_node: pd.Series) -> NodeData:
         node_data = self.extract_data(raw_node)
