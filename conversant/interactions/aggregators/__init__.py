@@ -1,2 +1,3 @@
 from conversant.interactions.aggregators.interactions_aggreagator import InteractionsAggregator
-from conversant.interactions.aggregators.aggregators_impl import CountInteractionsAggregator
+from conversant.interactions.aggregators.aggregators_impl import CountInteractionsAggregator, NodesInteractionsAggregator
+
