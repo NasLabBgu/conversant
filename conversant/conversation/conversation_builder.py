@@ -26,6 +26,7 @@ def build_conversation(nodes_data: Iterable[Tuple[NodeData, Any, Any]], conversa
         a Conversation object
     """
     children_map = {}
+    nodes_data = list(nodes_data)
     for node in nodes_data:
         parent_id = node[2]
         children = children_map.setdefault(parent_id, [])

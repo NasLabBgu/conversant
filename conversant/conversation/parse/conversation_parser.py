@@ -104,7 +104,8 @@ class ConversationParser(Generic[K, T], abc.ABC):
         """
         root_found = False
         root_parent_value = None if root_id is None else self.SPECIFIED_ROOT_PARENT_VALUE
-        for raw_node in self.iter_raw_nodes(raw_conversation):
+        nodes = list(self.iter_raw_nodes(raw_conversation))
+        for raw_node in nodes:
             node_data = self.extract_node_data(raw_node)
             node_id = self.get_node_id(node_data)
             parent_id = self.get_parent_id(node_data)
