@@ -120,7 +120,7 @@ def get_base_data(n: ConversationNode, conv: Conversation) -> Dict[str, Union[st
     NODE_RECORD_BASE_FIELDS = ["node_id", "author", "parent_id", "depth", "is_root", "is_absolute_root", "is_leaf", "timestamp", "conversation_id", "full_conv_id"]
     parent_id = None if n.parent is None else n.parent.node_id
     is_relative_root = conv.root.node_id == n.node_id
-    full_conv_id =  get_full_conv_id(conv.root)
+    full_conv_id = get_full_conv_id(conv.root)
     base_values = [n.node_id, n.author, parent_id, n.depth, is_relative_root, n.is_root, n.is_leaf, n.timestamp, conv.id, full_conv_id]
     return dict(zip(NODE_RECORD_BASE_FIELDS, base_values))
 
